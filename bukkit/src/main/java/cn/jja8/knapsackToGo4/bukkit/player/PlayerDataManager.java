@@ -20,6 +20,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.*;
 
+
 /**
  * 主要负责管理玩家的数据加载和保存
  * 包括玩家背包，玩家下线时的位置。
@@ -36,7 +37,12 @@ public class PlayerDataManager implements Listener {
         //事件监听器
         KnapsackToGo4.knapsackToGo4.getServer().getPluginManager().registerEvents(this, KnapsackToGo4.knapsackToGo4);
         //自动保存
-        KnapsackToGo4.knapsackToGo4.getServer().getScheduler().runTaskTimerAsynchronously(KnapsackToGo4.knapsackToGo4, () -> new ArrayList<>(playerLockMap.values()).forEach(lock ->lock.saveData() ), 20L * playerDataConfig.自动保存时间, 20L * playerDataConfig.自动保存时间);
+        KnapsackToGo4.knapsackToGo4.getServer().getScheduler().runTaskTimerAsynchronously(
+                KnapsackToGo4.knapsackToGo4,
+                () -> new ArrayList<>(playerLockMap.values()).forEach(PlayerDataLock::saveData),
+                20L * ConfigBukkit.playerDataConfig.自动保存时间,
+                20L * ConfigBukkit.playerDataConfig.自动保存时间
+        );
     }
     /**
      * 如果玩家没有加载完成，就加载完成后执行。如果已经加载完成就立即执行
@@ -101,12 +107,11 @@ public class PlayerDataManager implements Listener {
                         runnable.run();
                     }
                 }
-                event.getPlayer().spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ConfigBukkit.lang.玩家数据加载_完成));
+                event.getPlayer().spigot().sendMessage(ChatMessageType.ACTION_BAR,null, new TextComponent(ConfigBukkit.lang.玩家数据加载_完成));
             }
         };
         playerLoadRunMap.put(event.getPlayer(),加载);
         加载.runTaskTimer(KnapsackToGo4.knapsackToGo4, 1, ConfigBukkit.playerDataConfig.玩家数据解锁检测间隙);
-
     }
 
 
