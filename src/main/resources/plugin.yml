@@ -1,0 +1,6 @@
+name: KnapsackToGo4
+main: cn.jja8.knapsackToGo4.bukkit.KnapsackToGo4
+version: ${版本号}
+author: jianjianai
+api-version: 1.16
+softdepend: [patronSaint]

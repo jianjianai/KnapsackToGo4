@@ -1,0 +1,54 @@
+import java.text.SimpleDateFormat
+
+plugins {
+    id 'java'
+}
+
+group 'cn.jja8.knapsackToGo4'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+
+}
+
+test {
+    useJUnitPlatform()
+}
+
+jar.doFirst {
+    //获取当前时间作为版本号
+    SimpleDateFormat formatter = new SimpleDateFormat("yyyy.MM.dd.HHmm")
+    //设置版本号
+    version = formatter.format(new Date())+"-new";//"0.03"//
+    //替换配置文件版本号
+    Iterator<File> 文件列表 = fileTree(dir: "${projectDir}/build/resources/main/", includes: ['*yml']).getFiles().iterator()
+    while (文件列表.hasNext()) {
+        替换文本(文件列表.next(), '版本号', version.toString())
+    }
+}
+jar{
+    //将依赖植入jar包
+    configurations.implementation.canBeResolved(true)
+    from {
+        configurations.implementation.collect {
+            setDuplicatesStrategy(DuplicatesStrategy.EXCLUDE)
+            it.isDirectory() ? it : zipTree(it)
+        }
+    }
+    into('assets') {
+        from 'assets'
+    }
+}
+/**
+ 用作替换文件中的文本
+ */
+def static 替换文本(File file, String key, String value) {
+    def fileText = file.text
+    def regex = '\\$\\{' + key + '\\}'
+    fileText = (fileText =~ /${regex}/).replaceAll(value)
+    file.write(fileText)
+}

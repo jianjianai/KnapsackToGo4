@@ -1,0 +1,17 @@
+plugins {
+    id 'java'
+}
+
+
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+
+}
+
+test {
+    useJUnitPlatform()
+}
