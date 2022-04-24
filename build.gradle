@@ -12,7 +12,9 @@ repositories {
 }
 
 dependencies {
-
+    implementation project(":all")
+    implementation project(":bukkit")
+    implementation project(":bungeecord")
 }
 
 test {

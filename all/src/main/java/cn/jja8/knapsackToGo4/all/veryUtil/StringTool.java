@@ -1,4 +1,4 @@
-package cn.jja8.myWorld.all.veryUtil;
+package cn.jja8.knapsackToGo4.all.veryUtil;
 
 import java.util.ArrayList;
 import java.util.HashMap;

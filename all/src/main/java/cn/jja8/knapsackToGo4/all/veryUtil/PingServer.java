@@ -1,4 +1,4 @@
-package cn.jja8.myWorld.all.veryUtil;
+package cn.jja8.knapsackToGo4.all.veryUtil;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;

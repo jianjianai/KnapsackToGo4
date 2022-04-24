@@ -1,7 +1,7 @@
 package cn.jja8.knapsackToGo4.bukkit.basic.playerDataSupport.file;
 
 import cn.jja8.knapsackToGo4.bukkit.basic.playerDataSupport.PlayerDataLock;
-import cn.jja8.myWorld.all.veryUtil.FileLock;
+import cn.jja8.knapsackToGo4.all.veryUtil.FileLock;
 
 import java.io.*;
 

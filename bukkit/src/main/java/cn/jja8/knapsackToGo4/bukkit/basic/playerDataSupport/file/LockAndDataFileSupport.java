@@ -3,7 +3,7 @@ package cn.jja8.knapsackToGo4.bukkit.basic.playerDataSupport.file;
 import cn.jja8.knapsackToGo4.bukkit.KnapsackToGo4;
 import cn.jja8.knapsackToGo4.bukkit.basic.playerDataSupport.PlayerDataLock;
 import cn.jja8.knapsackToGo4.bukkit.basic.playerDataSupport.PlayerDataSupport;
-import cn.jja8.myWorld.all.veryUtil.FileLock;
+import cn.jja8.knapsackToGo4.all.veryUtil.FileLock;
 import cn.jja8.patronSaint_2022_3_2_1244.allUsed.file.YamlConfig;
 import org.bukkit.entity.Player;
 
