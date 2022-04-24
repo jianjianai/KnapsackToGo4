@@ -1,16 +1,22 @@
+
 plugins {
     id 'java'
 }
 
-
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
 
 repositories {
     mavenCentral()
 }
 
+
+
+
 dependencies {
-
-
+    compileOnly project(":all")
+    implementation fileTree(dir:'libs/implentation',includes:['*jar'])
+    compileOnly fileTree(dir:'libs/compileonly',includes:['*jar'])
 }
 
 test {
