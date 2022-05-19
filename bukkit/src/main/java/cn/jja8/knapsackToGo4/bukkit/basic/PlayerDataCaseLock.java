@@ -1,14 +1,14 @@
-package cn.jja8.knapsackToGo4.bukkit.basic.playerDataSupport;
+package cn.jja8.knapsackToGo4.bukkit.basic;
 
-public interface PlayerDataLock {
+public interface PlayerDataCaseLock {
     /**
      * 保存某玩家数据到公共的数据库中
      * */
-    void saveData() ;
+    void saveData(byte[] bytes) ;
     /**
      * 从公共的数据库中加载某玩家的数据
      * */
-    void loadData();
+    byte[] loadData();
     /**
      * 解锁，并且释放资源
      * */

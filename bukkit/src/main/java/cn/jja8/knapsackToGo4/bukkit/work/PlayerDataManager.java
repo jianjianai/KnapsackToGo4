@@ -1,10 +1,10 @@
-package cn.jja8.knapsackToGo4.bukkit.player;
+package cn.jja8.knapsackToGo4.bukkit.work;
 
 
 import cn.jja8.knapsackToGo4.bukkit.ConfigBukkit;
 import cn.jja8.knapsackToGo4.bukkit.KnapsackToGo4;
 import cn.jja8.knapsackToGo4.bukkit.basic.PlayerData;
-import cn.jja8.knapsackToGo4.bukkit.basic.playerDataSupport.PlayerDataLock;
+import cn.jja8.knapsackToGo4.bukkit.basic.PlayerDataCaseLock;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.entity.LivingEntity;
@@ -18,7 +18,10 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Queue;
 
 
 /**
@@ -28,7 +31,7 @@ import java.util.*;
  * */
 public class PlayerDataManager implements Listener {
     //玩家和锁map
-    Map<Player, PlayerDataLock> playerLockMap = new HashMap<>();
+    Map<Player, PlayerDataCaseLock> playerLockMap = new HashMap<>();
     //玩家和加载任务map
     Map<Player, BukkitRunnable> playerLoadRunMap = new HashMap<>();
     //玩家加载完成后运行队列
@@ -39,13 +42,13 @@ public class PlayerDataManager implements Listener {
         //自动保存
         KnapsackToGo4.knapsackToGo4.getServer().getScheduler().runTaskTimerAsynchronously(
                 KnapsackToGo4.knapsackToGo4,
-                () -> new ArrayList<>(playerLockMap.values()).forEach(PlayerDataLock::saveData),
+                () -> playerLockMap.forEach((player, playerDataCaseLock) -> playerDataCaseLock.saveData(PlayerData.playerDataSerialize.save(player))),
                 20L * ConfigBukkit.playerDataConfig.自动保存时间,
                 20L * ConfigBukkit.playerDataConfig.自动保存时间
         );
     }
     /**
-     * 如果玩家没有加载完成，就加载完成后执行。如果已经加载完成就立即执行
+     * 如果玩家没有加载完成，就加载完成后执行。如果已经加载完成就立即执行。如果玩家还没加载完成数据就退出服务器了就不会执行。
      * */
     public void playerLoadFinishedToRun(Player player, Runnable runnable){
         if (playerLoadRunMap.get(player)==null){
@@ -71,9 +74,9 @@ public class PlayerDataManager implements Listener {
             }
         }
         //如果有成功获得锁就保存数据，并解锁。
-        PlayerDataLock lock = playerLockMap.remove(event.getPlayer());
+        PlayerDataCaseLock lock = playerLockMap.remove(event.getPlayer());
         if (lock!=null){
-            lock.saveData();
+            lock.saveData(PlayerData.playerDataSerialize.save(event.getPlayer()));
             lock.unlock();
         }
     }
@@ -86,7 +89,7 @@ public class PlayerDataManager implements Listener {
             int time = 0;
             @Override
             public void run() {
-                PlayerDataLock lock = PlayerData.playerDataSupport.getPlayerDataLock(event.getPlayer(),ConfigBukkit.ServerConfig.服务器名称);
+                PlayerDataCaseLock lock = PlayerData.playerDataCase.getPlayerDataLock(event.getPlayer(),ConfigBukkit.ServerConfig.服务器名称);
                 if (lock==null) {
                     event.getPlayer().spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ConfigBukkit.lang.玩家数据加载_等待信息.replaceAll("<数>", String.valueOf(time))));
                     time++;
@@ -95,7 +98,7 @@ public class PlayerDataManager implements Listener {
                 playerLockMap.put(event.getPlayer(), lock);
                 this.cancel();
                 playerLoadRunMap.remove(event.getPlayer());
-                lock.loadData();
+                PlayerData.playerDataSerialize.load(event.getPlayer(),lock.loadData());
                 //加载完成任务
                 Queue<Runnable> queue = playerLoadFinishedToRunMap.get(event.getPlayer());
                 if (queue!=null){
@@ -142,7 +145,7 @@ public class PlayerDataManager implements Listener {
 
     public void close() {
         new HashMap<>(playerLockMap).forEach((player, lockWork) -> {
-            lockWork.saveData();
+            lockWork.saveData(PlayerData.playerDataSerialize.save(player));
             lockWork.unlock();
         });
     }

@@ -1,7 +1,7 @@
 package cn.jja8.knapsackToGo4.bukkit;
 
 import cn.jja8.knapsackToGo4.bukkit.basic.PlayerData;
-import cn.jja8.knapsackToGo4.bukkit.player.PlayerDataManager;
+import cn.jja8.knapsackToGo4.bukkit.work.PlayerDataManager;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 

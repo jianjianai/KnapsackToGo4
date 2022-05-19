@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="CompilerConfiguration">
-    <bytecodeTargetLevel target="1.8" />
+    <bytecodeTargetLevel target="1.8">
+      <module name="KnapsackToGo4.v1_16_R3" target="17" />
+      <module name="KnapsackToGo4.v1_16_R3.main" target="17" />
+      <module name="KnapsackToGo4.v1_16_R3.test" target="17" />
+    </bytecodeTargetLevel>
   </component>
 </project>
