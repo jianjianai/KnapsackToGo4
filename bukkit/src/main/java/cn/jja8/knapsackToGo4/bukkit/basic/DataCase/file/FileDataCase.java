@@ -11,13 +11,26 @@ import java.io.File;
 import java.io.IOException;
 
 public class FileDataCase implements PlayerDataCase {
+    static private FileDataCase fileDataCase = null;
+    public static PlayerDataCase get() {
+        if (fileDataCase==null){
+            try {
+                fileDataCase = new FileDataCase();
+            }catch (IOException e){
+                throw new Error(e);
+            }
+        }
+        return fileDataCase;
+    }
+
+
     File dataFile;
-    public FileDataCase() throws IOException {
+    private FileDataCase() throws IOException {
         FileDataCaseSetUp fileDataCaseSetUp = YamlConfig.loadFromFile(new File(KnapsackToGo4.knapsackToGo4.getDataFolder(),"FileDataCaseSetUp.yml"),new FileDataCaseSetUp());
         this.dataFile = new File(fileDataCaseSetUp.file);
         dataFile.mkdirs();
-    }
 
+    }
     @Override
     public PlayerDataCaseLock getPlayerDataLock(Player player, String serverName) {
         File playerDataFile = new File(dataFile, player.getUniqueId() +".dat");

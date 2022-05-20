@@ -1,7 +1,9 @@
 package cn.jja8.knapsackToGo4.bukkit.basic.DataSerialize.yaml;
 
 import cn.jja8.knapsackToGo4.bukkit.KnapsackToGo4;
+import cn.jja8.knapsackToGo4.bukkit.basic.DataCase.file.FileDataCase;
 import cn.jja8.knapsackToGo4.bukkit.basic.DataSerialize.yaml.part.*;
+import cn.jja8.knapsackToGo4.bukkit.basic.PlayerDataCase;
 import cn.jja8.knapsackToGo4.bukkit.basic.PlayerDataSerialize;
 import cn.jja8.patronSaint_2022_3_2_1244.allUsed.file.YamlConfig;
 import org.bukkit.configuration.ConfigurationSection;
@@ -16,9 +18,23 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class YamlDataSerialize implements PlayerDataSerialize {
+    static private YamlDataSerialize yamlDataSerialize = null;
+    public static YamlDataSerialize get() {
+        if (yamlDataSerialize==null){
+            try {
+                yamlDataSerialize = new YamlDataSerialize();
+            } catch (IOException e) {
+                throw new Error(e);
+            }
+        }
+        return yamlDataSerialize;
+    }
+
+
     private final Set<YamlDataSerializePart> yamlDataSerializePartSet = new HashSet<>();
-    public YamlDataSerialize() throws IOException {
+    private YamlDataSerialize() throws IOException {
         YamlDataSerializeSetUp c = YamlConfig.loadFromFile(new File(KnapsackToGo4.knapsackToGo4.getDataFolder(),"FileDataCaseSetUp.yml"),new YamlDataSerializeSetUp());
+        if (c.AdvancementProgress) yamlDataSerializePartSet.add(new AdvancementProgress());
         if (c.EnderChest) yamlDataSerializePartSet.add(new EnderChest());
         if (c.Experience) yamlDataSerializePartSet.add(new Experience());
         if (c.FoodLevel) yamlDataSerializePartSet.add(new FoodLevel());

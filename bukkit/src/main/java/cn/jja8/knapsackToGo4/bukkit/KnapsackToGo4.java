@@ -1,11 +1,8 @@
 package cn.jja8.knapsackToGo4.bukkit;
 
-import cn.jja8.knapsackToGo4.bukkit.basic.PlayerData;
 import cn.jja8.knapsackToGo4.bukkit.work.PlayerDataManager;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
-
-import java.lang.reflect.InvocationTargetException;
 
 public class KnapsackToGo4  extends JavaPlugin {
     public static KnapsackToGo4 knapsackToGo4;
@@ -21,7 +18,8 @@ public class KnapsackToGo4  extends JavaPlugin {
         String v = Bukkit.getServer().getClass().getName().split("\\.")[3];
         try {
             PlayerData.load();
-        } catch (ClassNotFoundException | NoSuchMethodException | InvocationTargetException | InstantiationException | IllegalAccessException e) {
+        } catch (Error|Exception e) {
+            e.printStackTrace();
             for (int i = 0; i < 3; i++) {
                 getLogger().severe("插件无法启用，可能暂时还不兼容当前服务端，您可以从网上下载兼容扩展来使插件兼容当前服务端。");
             }
@@ -38,5 +36,10 @@ public class KnapsackToGo4  extends JavaPlugin {
         getLogger().info("-------------------------------------------------------");
         getLogger().info("若有疑问，您可以前往 “PlugClub/插件实验室 - 820131534” 交流。");
         getLogger().warning("当前非正式版本，若有bug您可以前往 “PlugClub/插件实验室 - 820131534” 交流和反馈。");
+    }
+
+    @Override
+    public void onDisable() {
+        if (playerDataManager!=null) playerDataManager.close();
     }
 }
