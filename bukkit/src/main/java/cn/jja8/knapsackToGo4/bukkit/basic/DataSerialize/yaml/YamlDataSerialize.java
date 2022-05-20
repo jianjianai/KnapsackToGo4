@@ -17,7 +17,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class YamlDataSerialize implements PlayerDataSerialize {
-    static private YamlDataSerialize yamlDataSerialize = null;
+    static public YamlDataSerialize yamlDataSerialize = null;
     public static YamlDataSerialize get() {
         if (yamlDataSerialize==null){
             try {

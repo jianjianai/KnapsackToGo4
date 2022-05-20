@@ -20,14 +20,11 @@ public class KnapsackToGo4  extends JavaPlugin {
             PlayerData.load();
         } catch (Error|Exception e) {
             e.printStackTrace();
-            for (int i = 0; i < 3; i++) {
-                getLogger().severe("插件无法启用，可能暂时还不兼容当前服务端，您可以从网上下载兼容扩展来使插件兼容当前服务端。");
-            }
+            getLogger().severe("插件无法启用，请参考上方报错排查问题。若需反馈请将上方报错完整提交。");
             getLogger().severe("-------------------------------------------------------");
-            getLogger().severe("兼容版本：v1_16_R3");
             getLogger().severe("当前服务端版本："+v);
             getLogger().severe("-------------------------------------------------------");
-            getLogger().severe("如果您的服务器在兼容列表中，请自行排除上方报错！若有疑问，您可以前往 “PlugClub/插件实验室 - 820131534” 交流。");
+            getLogger().severe("若有疑问，您可以前往 “PlugClub/插件实验室 - 820131534” 交流。");
             return;
         }
         playerDataManager = new PlayerDataManager();
