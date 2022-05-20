@@ -1,11 +1,11 @@
 package cn.jja8.knapsackToGo4.bukkit.basic.DataSerialize.yaml;
 
 public class YamlDataSerializeSetUp {
-    boolean AdvancementProgress = false;
-    boolean EnderChest = true;
-    boolean Experience = true;
-    boolean FoodLevel = true;
-    boolean Health = true;
-    boolean Inventory = true;
-    boolean PotionEffects = true;
+    public boolean AdvancementProgress = false;
+    public boolean EnderChest = true;
+    public boolean Experience = true;
+    public boolean FoodLevel = true;
+    public boolean Health = true;
+    public boolean Inventory = true;
+    public boolean PotionEffects = true;
 }
