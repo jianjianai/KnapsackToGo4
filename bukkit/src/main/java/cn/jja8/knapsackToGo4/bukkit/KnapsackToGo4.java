@@ -2,6 +2,8 @@ package cn.jja8.knapsackToGo4.bukkit;
 
 import cn.jja8.knapsackToGo4.bukkit.work.PlayerDataManager;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class KnapsackToGo4  extends JavaPlugin {
@@ -33,6 +35,15 @@ public class KnapsackToGo4  extends JavaPlugin {
         getLogger().info("-------------------------------------------------------");
         getLogger().info("若有疑问，您可以前往 “PlugClub/插件实验室 - 820131534” 交流。");
         getLogger().warning("当前非正式版本，若有bug您可以前往 “PlugClub/插件实验室 - 820131534” 交流和反馈。");
+
+
+
+
+
+        //解决热重载玩家数据不加载的问题
+        for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
+            playerDataManager.PlayerJoinEvent(new PlayerJoinEvent(onlinePlayer,"欢迎"));
+        }
     }
 
     @Override
