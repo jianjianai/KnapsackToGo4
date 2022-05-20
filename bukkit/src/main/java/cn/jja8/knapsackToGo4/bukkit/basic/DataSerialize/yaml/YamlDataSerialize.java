@@ -1,7 +1,7 @@
 package cn.jja8.knapsackToGo4.bukkit.basic.DataSerialize.yaml;
 
 import cn.jja8.knapsackToGo4.bukkit.KnapsackToGo4;
-import cn.jja8.knapsackToGo4.bukkit.basic.DataSerialize.yaml.part.Inventory;
+import cn.jja8.knapsackToGo4.bukkit.basic.DataSerialize.yaml.part.*;
 import cn.jja8.knapsackToGo4.bukkit.basic.PlayerDataSerialize;
 import cn.jja8.patronSaint_2022_3_2_1244.allUsed.file.YamlConfig;
 import org.bukkit.configuration.ConfigurationSection;
@@ -19,9 +19,12 @@ public class YamlDataSerialize implements PlayerDataSerialize {
     private final Set<YamlDataSerializePart> yamlDataSerializePartSet = new HashSet<>();
     public YamlDataSerialize() throws IOException {
         YamlDataSerializeSetUp c = YamlConfig.loadFromFile(new File(KnapsackToGo4.knapsackToGo4.getDataFolder(),"FileDataCaseSetUp.yml"),new YamlDataSerializeSetUp());
-        if (c.Inventory){
-            yamlDataSerializePartSet.add(new Inventory());
-        }
+        if (c.EnderChest) yamlDataSerializePartSet.add(new EnderChest());
+        if (c.Experience) yamlDataSerializePartSet.add(new Experience());
+        if (c.FoodLevel) yamlDataSerializePartSet.add(new FoodLevel());
+        if (c.Health) yamlDataSerializePartSet.add(new Health());
+        if (c.Inventory) yamlDataSerializePartSet.add(new Inventory());
+        if (c.PotionEffects) yamlDataSerializePartSet.add(new PotionEffects());
     }
 
     @Override
