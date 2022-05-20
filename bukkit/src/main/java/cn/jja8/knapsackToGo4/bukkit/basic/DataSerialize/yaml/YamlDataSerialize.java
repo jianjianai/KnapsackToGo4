@@ -6,12 +6,12 @@ import cn.jja8.knapsackToGo4.bukkit.basic.PlayerDataSerialize;
 import cn.jja8.knapsackToGo4.bukkit.error.ConfigLoadError;
 import cn.jja8.patronSaint_2022_3_2_1244.allUsed.file.YamlConfig;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
 import java.util.Set;
@@ -63,12 +63,8 @@ public class YamlDataSerialize implements PlayerDataSerialize {
             return;
         }
         String ymlString = new String(bytes,StandardCharsets.UTF_8);
-        YamlConfiguration yamlConfiguration = new YamlConfiguration();
-        try {
-            yamlConfiguration.load(ymlString);
-        } catch (IOException | InvalidConfigurationException e) {
-            e.printStackTrace();
-        }
+        StringReader stringReader = new StringReader(ymlString);
+        YamlConfiguration yamlConfiguration = YamlConfiguration.loadConfiguration(stringReader);
         for (YamlDataSerializePart yamlDataSerializePart : yamlDataSerializePartSet) {
             try {
                 String key = yamlDataSerializePart.key();
@@ -81,5 +77,6 @@ public class YamlDataSerialize implements PlayerDataSerialize {
                 e.printStackTrace();
             }
         }
+        stringReader.close();
     }
 }

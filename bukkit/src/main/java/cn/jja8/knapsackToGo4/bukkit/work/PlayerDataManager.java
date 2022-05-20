@@ -6,21 +6,20 @@ import cn.jja8.knapsackToGo4.bukkit.KnapsackToGo4;
 import cn.jja8.knapsackToGo4.bukkit.PlayerData;
 import cn.jja8.knapsackToGo4.bukkit.basic.PlayerDataCaseLock;
 import cn.jja8.knapsackToGo4.bukkit.error.DataLoadError;
-import cn.jja8.knapsackToGo4.bukkit.error.DataUnSerializeError;
 import cn.jja8.knapsackToGo4.bukkit.error.DataSaveError;
 import cn.jja8.knapsackToGo4.bukkit.error.DataSerializeError;
+import cn.jja8.knapsackToGo4.bukkit.error.DataUnSerializeError;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageByBlockEvent;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityPickupItemEvent;
-import org.bukkit.event.player.PlayerDropItemEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.player.*;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.*;
@@ -179,26 +178,83 @@ public class PlayerDataManager implements Listener {
 
 
 
+    /**
+     * 返回玩家是否加载完成
+     * */
+    public boolean isLoaded(Player player){
+        return playerLockMap.containsKey(player);
+    }
+
 
     @EventHandler
     public void PlayerDropItemEvent(PlayerDropItemEvent event){//玩家丢东西
-        if (!playerLockMap.containsKey(event.getPlayer())){
+        if (!isLoaded(event.getPlayer())){
             event.setCancelled(true);
         }
     }
     @EventHandler
     public void EntityPickupItemEvent(EntityPickupItemEvent event){//物品拾取事件
-        LivingEntity entity = event.getEntity();
-        if (!(entity instanceof Player)){
+        if (!(event.getEntity() instanceof Player)){
             return;
         }
-        if (!playerLockMap.containsKey(entity)){
+        if (!isLoaded((Player) event.getEntity())){
             event.setCancelled(true);
         }
     }
     @EventHandler
     public void PlayerInteractEvent(PlayerInteractEvent event){//对象或空气进行交互
-        if (!playerLockMap.containsKey(event.getPlayer())){
+        if (!isLoaded(event.getPlayer())){
+            event.setCancelled(true);
+        }
+    }
+    @EventHandler
+    public void EntityDamageByBlockEvent(EntityDamageByBlockEvent event){//实体受到方块伤害
+        if (!(event.getEntity() instanceof Player)){
+            return;
+        }
+        if (!isLoaded((Player) event.getEntity())){
+            event.setCancelled(true);
+        }
+    }
+    @EventHandler
+    public void InventoryClickEvent(InventoryClickEvent event){//点击物品栏
+        if (!(event.getWhoClicked() instanceof Player)){
+            return;
+        }
+        if (!isLoaded((Player) event.getWhoClicked())){
+            event.setCancelled(true);
+        }
+    }
+    @EventHandler
+    public void AsyncPlayerChatEvent(AsyncPlayerChatEvent event){//聊天
+        if (!isLoaded(event.getPlayer())){
+            event.setCancelled(true);
+        }
+    }
+    @EventHandler
+    public void PlayerCommandPreprocessEvent(PlayerCommandPreprocessEvent event){//命令
+        if (!isLoaded(event.getPlayer())){
+            event.setCancelled(true);
+        }
+    }
+    @EventHandler
+    public void EntityDamageByEntityEvent(EntityDamageByEntityEvent event){//实体攻击实体
+        if (!(event.getEntity() instanceof Player)){
+            return;
+        }
+        if (!isLoaded((Player) event.getEntity())){
+            event.setCancelled(true);
+        }
+    }
+    @EventHandler
+    public void PlayerSwapHandItemsEvent(PlayerSwapHandItemsEvent event){//玩家切换副手
+        if (!isLoaded(event.getPlayer())){
+            event.setCancelled(true);
+        }
+    }
+    @EventHandler
+    public void WanJiaYiDong(PlayerMoveEvent event){//玩家移动时
+        if (!isLoaded(event.getPlayer())){
             event.setCancelled(true);
         }
     }
