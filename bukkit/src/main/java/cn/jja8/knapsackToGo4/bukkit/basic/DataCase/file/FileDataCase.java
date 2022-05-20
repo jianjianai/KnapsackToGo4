@@ -4,6 +4,7 @@ import cn.jja8.knapsackToGo4.all.veryUtil.FileLock;
 import cn.jja8.knapsackToGo4.bukkit.KnapsackToGo4;
 import cn.jja8.knapsackToGo4.bukkit.basic.PlayerDataCase;
 import cn.jja8.knapsackToGo4.bukkit.basic.PlayerDataCaseLock;
+import cn.jja8.knapsackToGo4.bukkit.error.ConfigLoadError;
 import cn.jja8.patronSaint_2022_3_2_1244.allUsed.file.YamlConfig;
 import org.bukkit.entity.Player;
 
@@ -17,7 +18,7 @@ public class FileDataCase implements PlayerDataCase {
             try {
                 fileDataCase = new FileDataCase();
             }catch (IOException e){
-                throw new Error(e);
+                throw new ConfigLoadError(e,"配置文件FileDataCaseSetUp.yml加载错误");
             }
         }
         return fileDataCase;

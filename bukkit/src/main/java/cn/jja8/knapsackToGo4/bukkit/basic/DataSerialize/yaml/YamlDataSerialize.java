@@ -1,10 +1,9 @@
 package cn.jja8.knapsackToGo4.bukkit.basic.DataSerialize.yaml;
 
 import cn.jja8.knapsackToGo4.bukkit.KnapsackToGo4;
-import cn.jja8.knapsackToGo4.bukkit.basic.DataCase.file.FileDataCase;
 import cn.jja8.knapsackToGo4.bukkit.basic.DataSerialize.yaml.part.*;
-import cn.jja8.knapsackToGo4.bukkit.basic.PlayerDataCase;
 import cn.jja8.knapsackToGo4.bukkit.basic.PlayerDataSerialize;
+import cn.jja8.knapsackToGo4.bukkit.error.ConfigLoadError;
 import cn.jja8.patronSaint_2022_3_2_1244.allUsed.file.YamlConfig;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.InvalidConfigurationException;
@@ -24,7 +23,7 @@ public class YamlDataSerialize implements PlayerDataSerialize {
             try {
                 yamlDataSerialize = new YamlDataSerialize();
             } catch (IOException e) {
-                throw new Error(e);
+                throw new ConfigLoadError(e,"配置文件YamlDataSerializeSetUp.yml加载错误");
             }
         }
         return yamlDataSerialize;
@@ -33,7 +32,7 @@ public class YamlDataSerialize implements PlayerDataSerialize {
 
     private final Set<YamlDataSerializePart> yamlDataSerializePartSet = new HashSet<>();
     private YamlDataSerialize() throws IOException {
-        YamlDataSerializeSetUp c = YamlConfig.loadFromFile(new File(KnapsackToGo4.knapsackToGo4.getDataFolder(),"FileDataCaseSetUp.yml"),new YamlDataSerializeSetUp());
+        YamlDataSerializeSetUp c = YamlConfig.loadFromFile(new File(KnapsackToGo4.knapsackToGo4.getDataFolder(),"YamlDataSerializeSetUp.yml"),new YamlDataSerializeSetUp());
         if (c.AdvancementProgress) yamlDataSerializePartSet.add(new AdvancementProgress());
         if (c.EnderChest) yamlDataSerializePartSet.add(new EnderChest());
         if (c.Experience) yamlDataSerializePartSet.add(new Experience());
@@ -60,6 +59,9 @@ public class YamlDataSerialize implements PlayerDataSerialize {
 
     @Override
     public void load(Player player, byte[] bytes) {
+        if (bytes==null){
+            return;
+        }
         String ymlString = new String(bytes,StandardCharsets.UTF_8);
         YamlConfiguration yamlConfiguration = new YamlConfiguration();
         try {

@@ -5,6 +5,10 @@ import cn.jja8.knapsackToGo4.bukkit.ConfigBukkit;
 import cn.jja8.knapsackToGo4.bukkit.KnapsackToGo4;
 import cn.jja8.knapsackToGo4.bukkit.PlayerData;
 import cn.jja8.knapsackToGo4.bukkit.basic.PlayerDataCaseLock;
+import cn.jja8.knapsackToGo4.bukkit.error.DataLoadError;
+import cn.jja8.knapsackToGo4.bukkit.error.DataUnSerializeError;
+import cn.jja8.knapsackToGo4.bukkit.error.DataSaveError;
+import cn.jja8.knapsackToGo4.bukkit.error.DataSerializeError;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
@@ -28,6 +32,28 @@ import java.util.*;
  * ”玩家数据“字段负责玩家数据的存储，如果需要使用其他保存方式可以在load阶段对他赋值。
  * */
 public class PlayerDataManager implements Listener {
+    /**
+     * 序列化玩家的数据
+     * */
+    static byte[] serialize(Player player) throws DataSerializeError{
+        try {
+            return PlayerData.playerDataSerialize.save(player);
+        }catch (Exception|Error e){
+            throw new DataSerializeError(e,"玩家"+player.getName()+"数据序列化错误！");
+        }
+    }
+    /**
+     * 保存玩家数据
+     * */
+    static void save(PlayerDataCaseLock playerDataCaseLock,byte[] data) throws DataSaveError{
+        try {
+            playerDataCaseLock.saveData(data);
+        }catch (Exception|Error e){
+            throw new DataSaveError(e,"玩家数据序保存错误！");
+        }
+    }
+
+
     UUID uuid = UUID.randomUUID();
     //玩家和锁map
     Map<Player, PlayerDataCaseLock> playerLockMap = new HashMap<>();
@@ -42,10 +68,10 @@ public class PlayerDataManager implements Listener {
         Bukkit.getScheduler().runTaskTimer(
                 KnapsackToGo4.knapsackToGo4,
                 () -> playerLockMap.forEach((player, playerDataCaseLock) -> {
-                    //主线程获取玩家数据
-                    byte[] data = PlayerData.playerDataSerialize.save(player);
-                    //异步存储玩家数据
-                    Bukkit.getScheduler().runTaskAsynchronously(KnapsackToGo4.knapsackToGo4, () -> playerDataCaseLock.saveData(data));
+                        //主线程获取玩家数据
+                        byte[] data = serialize(player);
+                        //异步存储玩家数据
+                        Bukkit.getScheduler().runTaskAsynchronously(KnapsackToGo4.knapsackToGo4, () -> save(playerDataCaseLock,data));
                 }),
                 20L * ConfigBukkit.playerDataConfig.自动保存时间,
                 20L * ConfigBukkit.playerDataConfig.自动保存时间
@@ -82,7 +108,7 @@ public class PlayerDataManager implements Listener {
         if (lock!=null){
             byte[] data = null;
             try {//防止保存数据异常影响到解锁
-                data = PlayerData.playerDataSerialize.save(event.getPlayer());
+                data = serialize(event.getPlayer());
             }catch (Exception|Error e){
                 e.printStackTrace();
             }
@@ -90,7 +116,7 @@ public class PlayerDataManager implements Listener {
             byte[] finalData = data;
             Bukkit.getScheduler().runTaskAsynchronously(KnapsackToGo4.knapsackToGo4, () -> {
                 if (finalData !=null){
-                    lock.saveData(finalData);
+                    save(lock,finalData);
                 }
                 lock.unlock();
             });
@@ -113,33 +139,38 @@ public class PlayerDataManager implements Listener {
                 }
                 playerLockMap.put(event.getPlayer(), lock);
                 this.cancel();
-                byte[] data = lock.loadData();
-                //异步获得锁和数据之后在主线程加载到玩家上
-                Bukkit.getScheduler().runTask(KnapsackToGo4.knapsackToGo4, () -> {
-                    try {//防止接口出异常影响正常运行
-                        PlayerData.playerDataSerialize.load(event.getPlayer(),data);
-                    }catch (Exception|Error e){
-                        e.printStackTrace();
-                    }
-                    playerLoadRunMap.remove(event.getPlayer());
-                    //加载完成任务
-                    Queue<Runnable> queue = playerLoadFinishedToRunMap.remove(event.getPlayer());
-                    if (queue!=null){
-                        while (true){
-                            Runnable runnable = queue.poll();
-                            if (runnable==null){
-                                break;
-                            }
-                            try {//防止出异常影响下一条任务运行。
-                                runnable.run();
-                            }catch (Exception|Error e){
-                                e.printStackTrace();
-                            }
-
+                try {
+                    byte[] data = lock.loadData();
+                    //异步获得锁和数据之后在主线程加载到玩家上
+                    Bukkit.getScheduler().runTask(KnapsackToGo4.knapsackToGo4, () -> {
+                        try {//防止接口出异常影响正常运行
+                            PlayerData.playerDataSerialize.load(event.getPlayer(),data);
+                        }catch (Exception|Error e){
+                            new DataUnSerializeError(e,"玩家"+event.getPlayer().getName()+"数据反序列化时发生错误。").printStackTrace();
                         }
-                    }
-                    event.getPlayer().spigot().sendMessage(ChatMessageType.ACTION_BAR,uuid, new TextComponent(ConfigBukkit.lang.玩家数据加载_完成));
-                });
+                        playerLoadRunMap.remove(event.getPlayer());
+                        //加载完成任务
+                        Queue<Runnable> queue = playerLoadFinishedToRunMap.remove(event.getPlayer());
+                        if (queue!=null){
+                            while (true){
+                                Runnable runnable = queue.poll();
+                                if (runnable==null){
+                                    break;
+                                }
+                                try {//防止出异常影响下一条任务运行。
+                                    runnable.run();
+                                }catch (Exception|Error e){
+                                    e.printStackTrace();
+                                }
+
+                            }
+                        }
+                        event.getPlayer().spigot().sendMessage(ChatMessageType.ACTION_BAR,uuid, new TextComponent(ConfigBukkit.lang.玩家数据加载_完成));
+                    });
+                }catch (Exception|Error e){
+                    new DataLoadError(e,"玩家"+event.getPlayer().getName()+"数据加载时发生错误。").printStackTrace();
+                }
+
             }
         };
         playerLoadRunMap.put(event.getPlayer(),run);
@@ -174,7 +205,7 @@ public class PlayerDataManager implements Listener {
 
     public void close() {
         new HashMap<>(playerLockMap).forEach((player, lockWork) -> {
-            lockWork.saveData(PlayerData.playerDataSerialize.save(player));
+            save(lockWork,serialize(player));
             lockWork.unlock();
         });
     }
