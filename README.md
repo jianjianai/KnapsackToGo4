@@ -156,3 +156,9 @@ PotionEffects: true #药水效果
 ~~~
 ### 扩展的配置文件
 扩展也会生成相应的配置文件，也许在KnapsackToGo4的文件夹中，也可能在扩展插件对应的文件夹中。去参考扩展的文档配置。
+
+
+# 建议与反馈
+issues：[Issues · 简简爱/KnapsackToGo4](https://gitee.com/jja8/KnapsackToGo4/issues)
+
+插件实验室：[PlugClub / 插件实验室](https://jq.qq.com/?_wv=1027&k=LyeQlfSK) （群号:820131534）
