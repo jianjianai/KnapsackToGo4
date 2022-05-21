@@ -10,7 +10,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
+/**
+ * 药水效果
+ * */
 public class PotionEffects implements YamlDataSerializePart {
     private static final String PotionEffects = "PotionEffects";
     @Override

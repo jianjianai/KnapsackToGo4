@@ -4,7 +4,9 @@ import cn.jja8.knapsackToGo4.bukkit.basic.dataSerialize.yaml.YamlDataSerializePa
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-
+/**
+ * 物品栏
+ * */
 public class Inventory implements YamlDataSerializePart {
     private static final String
             ItemStack = "ItemStack",

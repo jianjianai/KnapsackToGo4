@@ -4,6 +4,9 @@ import cn.jja8.knapsackToGo4.bukkit.basic.dataSerialize.yaml.YamlDataSerializePa
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
+/**
+ * 血量
+ * */
 public class Health implements YamlDataSerializePart {
     private static final String Health = "Health",MaxHealth = "MaxHealth";
     @Override

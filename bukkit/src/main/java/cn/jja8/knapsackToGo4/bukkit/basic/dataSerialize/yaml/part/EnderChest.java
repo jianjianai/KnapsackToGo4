@@ -5,6 +5,9 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+/**
+ * 末影箱
+ * */
 public class EnderChest implements YamlDataSerializePart {
     private static final String
             ItemStack = "ItemStack",

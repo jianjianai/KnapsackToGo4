@@ -11,6 +11,9 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
+/**
+ * 进度
+ * */
 public class AdvancementProgress implements YamlDataSerializePart {
     private static final String
             Reach = "Reach",
