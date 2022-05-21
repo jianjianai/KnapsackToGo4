@@ -1,15 +1,16 @@
 package cn.jja8.knapsackToGo4.bukkit.config.playerData;
 
+import cn.jja8.knapsackToGo4.bukkit.basic.PlayerDataSerialize;
 import cn.jja8.knapsackToGo4.bukkit.basic.dataSerialize.yaml.YamlDataSerialize;
 
 public enum PlayerDataSerializeType {
-    Yaml(YamlDataSerialize.get());
+    Yaml;
 
-    private final YamlDataSerialize yamlDataSerialize;
-    PlayerDataSerializeType(YamlDataSerialize yamlDataSerialize) {
-        this.yamlDataSerialize = yamlDataSerialize;
-    }
-    public YamlDataSerialize getYamlDataSerialize() {
-        return yamlDataSerialize;
+
+    public PlayerDataSerialize getYamlDataSerialize() {
+        switch (this){
+            default:return null;
+            case Yaml:return YamlDataSerialize.get();
+        }
     }
 }

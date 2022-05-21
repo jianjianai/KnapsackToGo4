@@ -1,4 +1,4 @@
-package cn.jja8.knapsackToGo4.bukkit.basic.dataCase.jdbc.error;
+package cn.jja8.knapsackToGo4.bukkit.basic.dataCase.sqlite.error;
 
 import cn.jja8.knapsackToGo4.bukkit.error.KnapsackToGo4Exception;
 

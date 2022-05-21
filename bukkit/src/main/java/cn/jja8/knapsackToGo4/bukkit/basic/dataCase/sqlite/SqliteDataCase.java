@@ -1,11 +1,11 @@
-package cn.jja8.knapsackToGo4.bukkit.basic.dataCase.jdbc;
+package cn.jja8.knapsackToGo4.bukkit.basic.dataCase.sqlite;
 
 import cn.jja8.knapsackToGo4.bukkit.ConfigBukkit;
 import cn.jja8.knapsackToGo4.bukkit.KnapsackToGo4;
 import cn.jja8.knapsackToGo4.bukkit.basic.PlayerDataCase;
 import cn.jja8.knapsackToGo4.bukkit.basic.PlayerDataCaseLock;
-import cn.jja8.knapsackToGo4.bukkit.basic.dataCase.jdbc.error.DatabaseConnectionException;
-import cn.jja8.knapsackToGo4.bukkit.basic.dataCase.jdbc.error.UpdateLockError;
+import cn.jja8.knapsackToGo4.bukkit.basic.dataCase.sqlite.error.DatabaseConnectionException;
+import cn.jja8.knapsackToGo4.bukkit.basic.dataCase.sqlite.error.UpdateLockError;
 import cn.jja8.knapsackToGo4.bukkit.error.ConfigLoadError;
 import cn.jja8.patronSaint_2022_3_2_1244.allUsed.file.YamlConfig;
 import org.bukkit.Bukkit;
@@ -17,16 +17,17 @@ import java.io.IOException;
 import java.sql.*;
 import java.util.UUID;
 
-public class JdbcDataCase implements PlayerDataCase {
+public class SqliteDataCase implements PlayerDataCase {
+    static public final String NULL = "NULL";
     static private final long MoreTime = 5000;//每次持有锁的时候多申请的时间。防止自己更新太慢被其他服务器抢。
 
-    static private JdbcDataCase fileDataCase = null;
+    static private SqliteDataCase fileDataCase = null;
     public static PlayerDataCase get() {
         if (fileDataCase==null){
             try {
-                fileDataCase = new JdbcDataCase();
+                fileDataCase = new SqliteDataCase();
             }catch (IOException e){
-                throw new ConfigLoadError(e,"配置文件JdbcDataCaseSetUp.yml加载错误");
+                throw new ConfigLoadError(e,"配置文件SqliteDataCaseSetUp.yml加载错误");
             } catch (DatabaseConnectionException | SQLException e) {
                 throw new ConfigLoadError(e,"初始化数据库连接失败！");
             }
@@ -34,26 +35,19 @@ public class JdbcDataCase implements PlayerDataCase {
         return fileDataCase;
     }
 
-    public final JdbcDataCaseSetUp jdbcDataCaseSetUp;
+    public final SqliteDataCaseSetUp sqliteDataCaseSetUp;
     private long lockExpirationTime = 0; //锁到期时间
     public final String lockUUID = UUID.randomUUID().toString();
     private BukkitTask TaskTimer;
-    public Connection getConnection() throws DatabaseConnectionException {
-        try {
-            return DriverManager.getConnection(jdbcDataCaseSetUp.dataBaseURL, jdbcDataCaseSetUp.userName, jdbcDataCaseSetUp.PassWord);
-        } catch (SQLException e) {
-            throw new DatabaseConnectionException(e,"数据库连接失败，请检查dataBaseURL，userName，PassWord是否正确。");
-        }
-    }
 
-    private JdbcDataCase() throws IOException, DatabaseConnectionException, SQLException {
-        jdbcDataCaseSetUp = YamlConfig.loadFromFile(new File(KnapsackToGo4.knapsackToGo4.getDataFolder(),"JdbcDataCaseSetUp.yml"),new JdbcDataCaseSetUp());
+    private SqliteDataCase() throws IOException, DatabaseConnectionException, SQLException {
+        sqliteDataCaseSetUp = YamlConfig.loadFromFile(new File(KnapsackToGo4.knapsackToGo4.getDataFolder(),"SqliteDataCaseSetUp.yml"),new SqliteDataCaseSetUp());
         Connection connection = getConnection();
         Statement statement = connection.createStatement();
         statement.execute("create table if not exists PlayerData(PlayerUUID varchar(36) not null constraint PlayerData_pk primary key, LockUUID varchar(36), Data blob)");
         statement.execute("create table if not exists LockServer(LockUUID varchar(36) not null constraint LockServer_pk primary key,ServerName varchar not null,LockToTile datetime)");
         statement.execute("create unique index if not exists PlayerData_PlayerUUID_uindex on PlayerData (PlayerUUID)");
-        statement.execute("create unique index if not exists LockServer_ServerName_uindex on LockServer(ServerName)");
+        statement.execute("create unique index if not exists LockServer_ServerName_uindex on LockServer(LockUUID)");
         statement.close();
         connection.close();
         updateLock();
@@ -67,8 +61,16 @@ public class JdbcDataCase implements PlayerDataCase {
         }, 1, 1);
     }
 
+    public Connection getConnection() throws DatabaseConnectionException {
+        try {
+            return DriverManager.getConnection(sqliteDataCaseSetUp.dataBaseURL, sqliteDataCaseSetUp.userName, sqliteDataCaseSetUp.PassWord);
+        } catch (SQLException e) {
+            throw new DatabaseConnectionException(e,"数据库连接失败，请检查dataBaseURL，userName，PassWord是否正确。");
+        }
+    }
+
     void updateLock(){
-        lockExpirationTime = System.currentTimeMillis()+jdbcDataCaseSetUp.holdLockTime;
+        lockExpirationTime = System.currentTimeMillis()+ sqliteDataCaseSetUp.holdLockTime;
         try (
                 Connection connection = getConnection();
                 PreparedStatement sel = connection.prepareStatement("select ServerName from LockServer where LockUUID=?");
@@ -121,8 +123,9 @@ public class JdbcDataCase implements PlayerDataCase {
                 if (resultSet.next()) {
                     LockServerUUID = resultSet.getString(1);
                 }else {
-                    try (PreparedStatement ins = connection.prepareStatement("insert into PlayerData(PlayerUUID) values (?)")){
+                    try (PreparedStatement ins = connection.prepareStatement("insert into PlayerData(PlayerUUID,LockUUID) values (?,?)")){
                         ins.setString(1,player.getUniqueId().toString());
+                        ins.setString(2,NULL);
                         ins.executeUpdate();
                     }
                 }
@@ -144,10 +147,10 @@ public class JdbcDataCase implements PlayerDataCase {
             //给玩家上自己的锁
             try (PreparedStatement update = connection.prepareStatement("update PlayerData set LockUUID=? where LockUUID=? and PlayerUUID=?")){
                 update.setString(1,lockUUID);
-                update.setString(2,LockServerUUID);
+                update.setString(2,LockServerUUID==null?NULL:LockServerUUID);
                 update.setString(3,player.getUniqueId().toString());
                 if (update.executeUpdate()>=1) {
-                    return new JdbcDataCaseLock(this,player.getUniqueId().toString(),lockUUID);//成功拿到锁
+                    return new SqliteDataCaseLock(this,player.getUniqueId().toString(),lockUUID);//成功拿到锁
                 }
             }
         } catch (DatabaseConnectionException | SQLException e) {

@@ -2,18 +2,21 @@ package cn.jja8.knapsackToGo4.bukkit.config.playerData;
 
 import cn.jja8.knapsackToGo4.bukkit.basic.dataCase.file.FileDataCase;
 import cn.jja8.knapsackToGo4.bukkit.basic.PlayerDataCase;
-import cn.jja8.knapsackToGo4.bukkit.basic.dataCase.jdbc.JdbcDataCase;
+import cn.jja8.knapsackToGo4.bukkit.basic.dataCase.mysql.MysqlDataCase;
+import cn.jja8.knapsackToGo4.bukkit.basic.dataCase.sqlite.SqliteDataCase;
 
 public enum PlayerDataCaseType {
-    File(FileDataCase.get()),
-    JDBC(JdbcDataCase.get())
-    ;
+    File,
+    Sqlite,
+    Mysql;
 
-    private final PlayerDataCase fileDataCase;
-    PlayerDataCaseType(PlayerDataCase fileDataCase) {
-        this.fileDataCase = fileDataCase;
-    }
+
     public PlayerDataCase getFileDataCase() {
-        return fileDataCase;
+        switch (this){
+            default:return null;
+            case File:return FileDataCase.get();
+            case Sqlite:return SqliteDataCase.get();
+            case Mysql:return MysqlDataCase.get();
+        }
     }
 }

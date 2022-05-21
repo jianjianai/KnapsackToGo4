@@ -1,19 +1,19 @@
-package cn.jja8.knapsackToGo4.bukkit.basic.dataCase.jdbc;
+package cn.jja8.knapsackToGo4.bukkit.basic.dataCase.sqlite;
 
 import cn.jja8.knapsackToGo4.bukkit.basic.PlayerDataCaseLock;
-import cn.jja8.knapsackToGo4.bukkit.basic.dataCase.jdbc.error.DatabaseConnectionException;
+import cn.jja8.knapsackToGo4.bukkit.basic.dataCase.sqlite.error.DatabaseConnectionException;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class JdbcDataCaseLock implements PlayerDataCaseLock {
-    JdbcDataCase jdbcDataCase;
+public class SqliteDataCaseLock implements PlayerDataCaseLock {
+    SqliteDataCase sqliteDataCase;
     String playerUUid;
     String lockUUID;
-    public JdbcDataCaseLock(JdbcDataCase jdbcDataCase, String playerUUid, String lockUUID) {
-        this.jdbcDataCase = jdbcDataCase;
+    public SqliteDataCaseLock(SqliteDataCase sqliteDataCase, String playerUUid, String lockUUID) {
+        this.sqliteDataCase = sqliteDataCase;
         this.playerUUid = playerUUid;
         this.lockUUID = lockUUID;
     }
@@ -21,7 +21,7 @@ public class JdbcDataCaseLock implements PlayerDataCaseLock {
     @Override
     public void saveData(byte[] bytes) {
         try (
-                Connection connection = jdbcDataCase.getConnection();
+                Connection connection = sqliteDataCase.getConnection();
                 PreparedStatement preparedStatement = connection.prepareStatement("update PlayerData set Data=? where PlayerUUID=?;")
         ){
             preparedStatement.setBytes(1,bytes);
@@ -35,7 +35,7 @@ public class JdbcDataCaseLock implements PlayerDataCaseLock {
     @Override
     public byte[] loadData() {
         try (
-                Connection connection = jdbcDataCase.getConnection();
+                Connection connection = sqliteDataCase.getConnection();
                 PreparedStatement preparedStatement = connection.prepareStatement("select Data from PlayerData where PlayerUUID=?")
         ){
             preparedStatement.setString(1,playerUUid);
@@ -53,10 +53,10 @@ public class JdbcDataCaseLock implements PlayerDataCaseLock {
     @Override
     public void unlock() {
         try (
-                Connection connection = jdbcDataCase.getConnection();
+                Connection connection = sqliteDataCase.getConnection();
                 PreparedStatement preparedStatement = connection.prepareStatement("update PlayerData set LockUUID=? where PlayerUUID=?;")
         ){
-            preparedStatement.setString(1,null);
+            preparedStatement.setString(1, SqliteDataCase.NULL);
             preparedStatement.setString(2,playerUUid);
             preparedStatement.executeUpdate();
         } catch (DatabaseConnectionException | SQLException e) {

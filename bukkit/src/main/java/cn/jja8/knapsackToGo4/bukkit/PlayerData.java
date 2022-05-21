@@ -48,6 +48,6 @@ public class PlayerData {
     }
 
     static void close(){
-        playerDataCase.close();
+        if (playerDataCase!=null)playerDataCase.close();
     }
 }
