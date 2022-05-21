@@ -154,5 +154,5 @@ Health: true #血量
 Inventory: true #物品栏
 PotionEffects: true #药水效果
 ~~~
-### 扩展的配置问
+### 扩展的配置文件
 扩展也会生成相应的配置文件，也许在KnapsackToGo4的文件夹中，也可能在扩展插件对应的文件夹中。去参考扩展的文档配置。
