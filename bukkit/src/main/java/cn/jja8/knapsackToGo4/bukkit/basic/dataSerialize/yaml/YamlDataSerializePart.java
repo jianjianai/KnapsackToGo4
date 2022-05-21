@@ -1,4 +1,4 @@
-package cn.jja8.knapsackToGo4.bukkit.basic.DataSerialize.yaml;
+package cn.jja8.knapsackToGo4.bukkit.basic.dataSerialize.yaml;
 
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;

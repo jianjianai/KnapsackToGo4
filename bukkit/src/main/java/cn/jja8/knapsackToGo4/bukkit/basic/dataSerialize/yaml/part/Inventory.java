@@ -1,22 +1,23 @@
-package cn.jja8.knapsackToGo4.bukkit.basic.DataSerialize.yaml.part;
+package cn.jja8.knapsackToGo4.bukkit.basic.dataSerialize.yaml.part;
 
-import cn.jja8.knapsackToGo4.bukkit.basic.DataSerialize.yaml.YamlDataSerializePart;
+import cn.jja8.knapsackToGo4.bukkit.basic.dataSerialize.yaml.YamlDataSerializePart;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-public class EnderChest implements YamlDataSerializePart {
+public class Inventory implements YamlDataSerializePart {
     private static final String
             ItemStack = "ItemStack",
             ItemStackLen = "Len";
+
     @Override
     public String key() {
-        return "EnderChest";
+        return "Inventory";
     }
 
     @Override
     public void saveToYaml(Player player, ConfigurationSection configuration) {
-        org.bukkit.inventory.ItemStack[] all = player.getEnderChest().getContents();
+        ItemStack[] all = player.getInventory().getContents();
         configuration.set(ItemStackLen,all.length);
         ConfigurationSection itemStack = configuration.createSection(ItemStack);
         for (int i = 0; i < all.length; i++) {
@@ -38,6 +39,6 @@ public class EnderChest implements YamlDataSerializePart {
         for (int i = 0; i < all.length; i++) {
             all[i] = itemStack.getItemStack(String.valueOf(i));
         }
-        player.getEnderChest().setContents(all);
+        player.getInventory().setContents(all);
     }
 }

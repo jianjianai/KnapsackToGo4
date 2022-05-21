@@ -1,6 +1,6 @@
-package cn.jja8.knapsackToGo4.bukkit.basic.DataSerialize.yaml.part;
+package cn.jja8.knapsackToGo4.bukkit.basic.dataSerialize.yaml.part;
 
-import cn.jja8.knapsackToGo4.bukkit.basic.DataSerialize.yaml.YamlDataSerializePart;
+import cn.jja8.knapsackToGo4.bukkit.basic.dataSerialize.yaml.YamlDataSerializePart;
 import org.bukkit.Bukkit;
 import org.bukkit.advancement.Advancement;
 import org.bukkit.configuration.ConfigurationSection;

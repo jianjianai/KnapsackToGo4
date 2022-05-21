@@ -46,4 +46,8 @@ public class PlayerData {
             }
         }
     }
+
+    static void close(){
+        playerDataCase.close();
+    }
 }

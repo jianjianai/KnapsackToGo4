@@ -49,5 +49,6 @@ public class KnapsackToGo4  extends JavaPlugin {
     @Override
     public void onDisable() {
         if (playerDataManager!=null) playerDataManager.close();
+        PlayerData.close();
     }
 }

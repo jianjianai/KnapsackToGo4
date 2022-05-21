@@ -1,6 +1,6 @@
 package cn.jja8.knapsackToGo4.bukkit.config.playerData;
 
-import cn.jja8.knapsackToGo4.bukkit.basic.DataSerialize.yaml.YamlDataSerialize;
+import cn.jja8.knapsackToGo4.bukkit.basic.dataSerialize.yaml.YamlDataSerialize;
 
 public enum PlayerDataSerializeType {
     Yaml(YamlDataSerialize.get());

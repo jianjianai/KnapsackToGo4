@@ -1,4 +1,4 @@
-package cn.jja8.knapsackToGo4.bukkit.basic.DataCase.file;
+package cn.jja8.knapsackToGo4.bukkit.basic.dataCase.file;
 
 import cn.jja8.knapsackToGo4.all.veryUtil.FileLock;
 import cn.jja8.knapsackToGo4.bukkit.basic.PlayerDataCaseLock;

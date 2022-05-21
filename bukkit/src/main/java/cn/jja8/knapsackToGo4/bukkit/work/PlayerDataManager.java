@@ -130,7 +130,7 @@ public class PlayerDataManager implements Listener {
             int time = 0;
             @Override
             public void run() {
-                PlayerDataCaseLock lock = PlayerData.playerDataCase.getPlayerDataLock(event.getPlayer(),ConfigBukkit.ServerConfig.服务器名称);
+                PlayerDataCaseLock lock = PlayerData.playerDataCase.getPlayerDataLock(event.getPlayer());
                 if (lock==null) {
                     event.getPlayer().spigot().sendMessage(ChatMessageType.ACTION_BAR,uuid,new TextComponent(ConfigBukkit.lang.玩家数据加载_等待信息.replaceAll("<数>", String.valueOf(time))));
                     time++;

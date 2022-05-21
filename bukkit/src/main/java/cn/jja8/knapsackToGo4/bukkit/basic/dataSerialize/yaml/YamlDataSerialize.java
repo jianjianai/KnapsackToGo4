@@ -1,7 +1,7 @@
-package cn.jja8.knapsackToGo4.bukkit.basic.DataSerialize.yaml;
+package cn.jja8.knapsackToGo4.bukkit.basic.dataSerialize.yaml;
 
 import cn.jja8.knapsackToGo4.bukkit.KnapsackToGo4;
-import cn.jja8.knapsackToGo4.bukkit.basic.DataSerialize.yaml.part.*;
+import cn.jja8.knapsackToGo4.bukkit.basic.dataSerialize.yaml.part.*;
 import cn.jja8.knapsackToGo4.bukkit.basic.PlayerDataSerialize;
 import cn.jja8.knapsackToGo4.bukkit.error.ConfigLoadError;
 import cn.jja8.patronSaint_2022_3_2_1244.allUsed.file.YamlConfig;

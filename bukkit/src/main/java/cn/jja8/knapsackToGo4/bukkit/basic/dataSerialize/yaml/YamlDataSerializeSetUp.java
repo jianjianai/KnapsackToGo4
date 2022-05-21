@@ -1,4 +1,4 @@
-package cn.jja8.knapsackToGo4.bukkit.basic.DataSerialize.yaml;
+package cn.jja8.knapsackToGo4.bukkit.basic.dataSerialize.yaml;
 
 public class YamlDataSerializeSetUp {
     public boolean AdvancementProgress = false;

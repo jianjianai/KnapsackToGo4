@@ -1,6 +1,7 @@
-package cn.jja8.knapsackToGo4.bukkit.basic.DataCase.file;
+package cn.jja8.knapsackToGo4.bukkit.basic.dataCase.file;
 
 import cn.jja8.knapsackToGo4.all.veryUtil.FileLock;
+import cn.jja8.knapsackToGo4.bukkit.ConfigBukkit;
 import cn.jja8.knapsackToGo4.bukkit.KnapsackToGo4;
 import cn.jja8.knapsackToGo4.bukkit.basic.PlayerDataCase;
 import cn.jja8.knapsackToGo4.bukkit.basic.PlayerDataCaseLock;
@@ -33,10 +34,10 @@ public class FileDataCase implements PlayerDataCase {
 
     }
     @Override
-    public PlayerDataCaseLock getPlayerDataLock(Player player, String serverName) {
+    public PlayerDataCaseLock getPlayerDataLock(Player player) {
         File playerDataFile = new File(dataFile, player.getUniqueId() +".dat");
         File playerLockFile = new File(dataFile, player.getUniqueId() +".lock");
-        FileLock fileLock = FileLock.getFileLock(playerLockFile,serverName);
+        FileLock fileLock = FileLock.getFileLock(playerLockFile, ConfigBukkit.ServerConfig.serverName);
         if (fileLock==null){
             return null;
         }
