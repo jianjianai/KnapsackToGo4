@@ -1,6 +1,7 @@
 package cn.jja8.knapsackToGo4.bukkit;
 
 import cn.jja8.knapsackToGo4.bukkit.work.PlayerDataManager;
+import cn.jja8.patronSaint_2022_3_2_1244.bukkit.bStats.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -44,6 +45,7 @@ public class KnapsackToGo4  extends JavaPlugin {
         for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
             playerDataManager.PlayerJoinEvent(new PlayerJoinEvent(onlinePlayer,"欢迎"));
         }
+        new Metrics(this, 15256);
     }
 
     @Override
