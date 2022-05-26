@@ -9,6 +9,11 @@ import org.bukkit.entity.Player;
  * */
 public class Health implements YamlDataSerializePart {
     private static final String Health = "Health",MaxHealth = "MaxHealth";
+    private final boolean offMaxHealth;
+    public Health(boolean offMaxHealth) {
+        this.offMaxHealth = offMaxHealth;
+    }
+
     @Override
     public String key() {
         return "Health";
@@ -16,24 +21,26 @@ public class Health implements YamlDataSerializePart {
 
     @Override
     public void saveToYaml(Player player, ConfigurationSection configuration) {
-        configuration.set(MaxHealth,player.getMaxHealth());
+        if(offMaxHealth)configuration.set(MaxHealth,player.getMaxHealth());//虽然过时了，但是先用着吧
         configuration.set(Health,player.getHealth());
     }
 
     @Override
     public void loadFormYaml(Player player, ConfigurationSection configuration) {
-        if (!configuration.contains(Health)) {
-            return;
+        if (offMaxHealth&&configuration.contains(MaxHealth)){
+            double maxHealth = configuration.getDouble(MaxHealth);
+            player.setMaxHealth(maxHealth);
         }
-        if (!configuration.contains(MaxHealth)){
-            return;
+        if (configuration.contains(Health)) {
+            double health = configuration.getDouble(Health);
+            if (health<1){
+                health=1;
+            }
+            double max = player.getMaxHealth();
+            if (health>max){
+                health = max;
+            }
+            player.setHealth(health);
         }
-        double maxHealth = configuration.getDouble(MaxHealth);
-        double health = configuration.getDouble(Health);
-        if (health<1){
-            health=1;
-        }
-        player.setMaxHealth(maxHealth);
-        player.setHealth(health);
     }
 }

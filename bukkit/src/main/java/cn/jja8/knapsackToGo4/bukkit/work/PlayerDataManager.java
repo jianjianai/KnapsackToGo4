@@ -53,7 +53,6 @@ public class PlayerDataManager implements Listener {
     }
 
 
-    UUID uuid = UUID.randomUUID();
     //玩家和锁map
     Map<Player, PlayerDataCaseLock> playerLockMap = new HashMap<>();
     //玩家和加载任务map
@@ -132,7 +131,8 @@ public class PlayerDataManager implements Listener {
             public void run() {
                 PlayerDataCaseLock lock = PlayerData.playerDataCase.getPlayerDataLock(event.getPlayer());
                 if (lock==null) {
-                    event.getPlayer().spigot().sendMessage(ChatMessageType.ACTION_BAR,uuid,new TextComponent(ConfigBukkit.lang.玩家数据加载_等待信息.replaceAll("<数>", String.valueOf(time))));
+                    //这个sendMessage在1.18又不是过时的
+                    event.getPlayer().spigot().sendMessage(ChatMessageType.ACTION_BAR,new TextComponent(ConfigBukkit.lang.玩家数据加载_等待信息.replaceAll("<数>", String.valueOf(time))));
                     time++;
                     return;
                 }
@@ -164,7 +164,8 @@ public class PlayerDataManager implements Listener {
 
                             }
                         }
-                        event.getPlayer().spigot().sendMessage(ChatMessageType.ACTION_BAR,uuid, new TextComponent(ConfigBukkit.lang.玩家数据加载_完成));
+                        //这个sendMessage在1.18又不是过时的
+                        event.getPlayer().spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ConfigBukkit.lang.玩家数据加载_完成));
                     });
                 }catch (Exception|Error e){
                     new DataLoadError(e,"玩家"+event.getPlayer().getName()+"数据加载时发生错误。").printStackTrace();
