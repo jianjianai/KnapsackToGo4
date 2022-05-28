@@ -5,10 +5,7 @@ import cn.jja8.knapsackToGo4.bukkit.ConfigBukkit;
 import cn.jja8.knapsackToGo4.bukkit.KnapsackToGo4;
 import cn.jja8.knapsackToGo4.bukkit.PlayerData;
 import cn.jja8.knapsackToGo4.bukkit.basic.PlayerDataCaseLock;
-import cn.jja8.knapsackToGo4.bukkit.error.DataLoadError;
-import cn.jja8.knapsackToGo4.bukkit.error.DataSaveError;
-import cn.jja8.knapsackToGo4.bukkit.error.DataSerializeError;
-import cn.jja8.knapsackToGo4.bukkit.error.DataUnSerializeError;
+import cn.jja8.knapsackToGo4.bukkit.error.*;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
@@ -136,7 +133,6 @@ public class PlayerDataManager implements Listener {
                     time++;
                     return;
                 }
-                playerLockMap.put(event.getPlayer(), lock);
                 this.cancel();
                 try {
                     byte[] data = lock.loadData();
@@ -147,7 +143,9 @@ public class PlayerDataManager implements Listener {
                         }catch (Exception|Error e){
                             new DataUnSerializeError(e,"玩家"+event.getPlayer().getName()+"数据反序列化时发生错误。").printStackTrace();
                         }
+                        //玩家数据加载完成
                         playerLoadRunMap.remove(event.getPlayer());
+                        playerLockMap.put(event.getPlayer(), lock);//完成这一条才算真的完成
                         //加载完成任务
                         Queue<Runnable> queue = playerLoadFinishedToRunMap.remove(event.getPlayer());
                         if (queue!=null){
@@ -159,7 +157,7 @@ public class PlayerDataManager implements Listener {
                                 try {//防止出异常影响下一条任务运行。
                                     runnable.run();
                                 }catch (Exception|Error e){
-                                    e.printStackTrace();
+                                    new LoadFinishedToRunError(e,"玩家数据加载完成任务执行时发生异常！").printStackTrace();
                                 }
 
                             }
