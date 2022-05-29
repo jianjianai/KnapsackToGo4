@@ -1,6 +1,8 @@
 package cn.jja8.knapsackToGo4.bukkit.basic.dataSerialize.yaml;
 
 import cn.jja8.knapsackToGo4.bukkit.KnapsackToGo4;
+import cn.jja8.knapsackToGo4.bukkit.basic.dataSerialize.yaml.error.PatrLoadError;
+import cn.jja8.knapsackToGo4.bukkit.basic.dataSerialize.yaml.error.PatrSaveError;
 import cn.jja8.knapsackToGo4.bukkit.basic.dataSerialize.yaml.part.*;
 import cn.jja8.knapsackToGo4.bukkit.basic.PlayerDataSerialize;
 import cn.jja8.knapsackToGo4.bukkit.error.ConfigLoadError;
@@ -30,7 +32,7 @@ public class YamlDataSerialize implements PlayerDataSerialize {
     }
 
 
-    private final Set<YamlDataSerializePart> yamlDataSerializePartSet = new HashSet<>();
+    public final Set<YamlDataSerializePart> yamlDataSerializePartSet = new HashSet<>();
     private YamlDataSerialize() throws IOException {
         YamlDataSerializeSetUp c = YamlConfig.loadFromFile(new File(KnapsackToGo4.knapsackToGo4.getDataFolder(),"YamlDataSerializeSetUp.yml"),new YamlDataSerializeSetUp());
         if (c.AdvancementProgress) yamlDataSerializePartSet.add(new AdvancementProgress());
@@ -46,12 +48,13 @@ public class YamlDataSerialize implements PlayerDataSerialize {
     public byte[] save(Player player) {
         YamlConfiguration yamlConfiguration = new YamlConfiguration();
         for (YamlDataSerializePart yamlDataSerializePart : yamlDataSerializePartSet) {
+            String key = null;
             try {
-                String key = yamlDataSerializePart.key();
+                key = yamlDataSerializePart.key();
                 ConfigurationSection part = yamlConfiguration.createSection(key);
                 yamlDataSerializePart.saveToYaml(player,part);
             }catch (Exception|Error e){
-                e.printStackTrace();
+                new PatrSaveError(e,"在保存玩家"+player.getName()+"的"+key+"部分数据时发生异常，已经跳过！").printStackTrace();
             }
         }
         return yamlConfiguration.saveToString().getBytes(StandardCharsets.UTF_8);
@@ -66,15 +69,16 @@ public class YamlDataSerialize implements PlayerDataSerialize {
         StringReader stringReader = new StringReader(ymlString);
         YamlConfiguration yamlConfiguration = YamlConfiguration.loadConfiguration(stringReader);
         for (YamlDataSerializePart yamlDataSerializePart : yamlDataSerializePartSet) {
+            String key = null;
             try {
-                String key = yamlDataSerializePart.key();
+                key = yamlDataSerializePart.key();
                 ConfigurationSection part = yamlConfiguration.getConfigurationSection(key);
                 if (part==null){
                     continue;
                 }
                 yamlDataSerializePart.loadFormYaml(player,part);
             }catch (Exception|Error e){
-                e.printStackTrace();
+                new PatrLoadError(e,"在保加载家"+player.getName()+"的"+key+"部分数据时发生异常，已经跳过！").printStackTrace();
             }
         }
         stringReader.close();

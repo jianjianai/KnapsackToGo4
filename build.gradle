@@ -34,15 +34,11 @@ jar.doFirst {
 }
 jar{
     //将依赖植入jar包
-    configurations.implementation.canBeResolved(true)
     from {
-        configurations.implementation.collect {
+        configurations.runtimeClasspath.collect {
             setDuplicatesStrategy(DuplicatesStrategy.EXCLUDE)
             it.isDirectory() ? it : zipTree(it)
         }
-    }
-    into('assets') {
-        from 'assets'
     }
 }
 /**

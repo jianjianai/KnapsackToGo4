@@ -20,7 +20,7 @@ public class PlayerData {
     public static PlayerDataCase playerDataCase = null;
     public static PlayerDataSerialize playerDataSerialize = null;
 
-    public static void load() throws ConfigLoadException {
+    static void load() throws ConfigLoadException {
         if (playerDataCase==null){
             String playerDataCase = null;
             try {
