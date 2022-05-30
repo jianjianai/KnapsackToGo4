@@ -11,8 +11,10 @@
 - 文件
 - mysql
 - sqlite
+
 ## 自带的序列化方式
 - Yaml
+
 ## 作者编写的扩展列表
 https://gitee.com/jja8/KnapsackToGo4Plugin/blob/master/README.md
 
@@ -48,8 +50,10 @@ ps：
 # 使用方法
 
 ## 名词定义
+
 #### 数据容器
 存储数据的方式。用来存数据。比如记录文字可以用纸和笔，也可以用电脑或手机，还可以刻在石头上。
+
 #### 数据序列化
 加载和保存数据的方式。比如你可以用汉语表达信息，也可以用英语表达信息。
 
@@ -103,10 +107,12 @@ PlayerDataCase.yml是告诉插件要注册什么数据容器，其实容器类�
 PlayerDataSerialize.yml是告诉插件要注册什么序列化方法，其实序列化扩展就是注册自己的序列化方法，所以在有扩展的时候就不会生成PlayerDataSerialize.yml配置文件。
 
 目前插件有三种数据容器，一种序列化方法。
+
 #### 容器列表
 - File 用文件的方法存储数据
 - Sqlite 一款轻型的数据库，储存在单一文件中的一个完整的数据库，无需安装和管理配置。
 - Mysql 一款轻量级数据库，通过网络连接。
+
 #### 序列化方法列表
 - Yaml
 
@@ -129,11 +135,13 @@ playerDataSerializeType: Yaml  #填上方的其中一种就行了
 因为安装扩展就相当于已经选择扩展作为数据容器或序列化方法了，所以自然不需要了。
 
 ### 插件自带的数据容器的配置文件
+
 #### File
 FileDataCaseSetUp.yml
 ~~~yaml
 file: <文件位置>  #这里填写数据保存到的文件夹路径
 ~~~
+
 #### Sqlite
 MysqlDataCaseSetUp.yml
 ~~~yaml
@@ -142,6 +150,7 @@ PassWord: 778899& #密码
 dataBaseURL: jdbc:mysql://127.0.0.1/KnapsackToGo4 #数据库URL
 holdLockTime: 30000 #持有锁时间，数值越小数据库更新越频繁，但是服务器崩溃后自解锁越快。如果服务器基本不崩溃可以适当地设置长一点。但是设置太长了服务器如果突然崩溃就要等很久。
 ~~~
+
 #### Mysql
 SqliteDataCaseSetUp.yml
 ~~~yaml
@@ -152,6 +161,7 @@ holdLockTime: 30000 #持有锁时间，数值越小数据库更新越频繁，�
 ~~~
 
 ### 插件自带的序列化方法的配置文件
+
 #### Yaml
 YamlDataSerializeSetUp.yml
 ~~~yaml
@@ -163,6 +173,7 @@ Health: true #血量
 Inventory: true #物品栏
 PotionEffects: true #药水效果
 ~~~
+
 ### 扩展的配置文件
 扩展也会生成相应的配置文件，也许在KnapsackToGo4的文件夹中，也可能在扩展插件对应的文件夹中。去参考扩展的文档配置。
 
