@@ -104,7 +104,7 @@ public class PlayerDataManager implements Listener {
             byte[] data = null;
             try {//防止保存数据异常影响到解锁
                 data = serialize(event.getPlayer());
-            }catch (Exception|Error e){
+            }catch (DataSerializeError e){
                 e.printStackTrace();
             }
             //在异步保存数据并解锁
