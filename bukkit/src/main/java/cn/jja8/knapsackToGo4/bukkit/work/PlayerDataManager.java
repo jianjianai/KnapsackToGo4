@@ -113,7 +113,12 @@ public class PlayerDataManager implements Listener {
                 if (finalData !=null){
                     save(lock,finalData);
                 }
-                lock.unlock();
+                try {
+                    lock.unlock();
+                }catch (Exception|Error e){
+                    new DataUnLockError(e,"在为"+event.getPlayer().getName()+"解锁时发生异常！").printStackTrace();
+                }
+
             });
         }
     }
@@ -126,7 +131,12 @@ public class PlayerDataManager implements Listener {
             int time = 0;
             @Override
             public void run() {
-                PlayerDataCaseLock lock = PlayerData.playerDataCase.getPlayerDataLock(event.getPlayer());
+                PlayerDataCaseLock lock = null;
+                try {
+                    lock = PlayerData.playerDataCase.getPlayerDataLock(event.getPlayer());
+                }catch (Exception|Error e){
+                    new DataGetLockError(e,"在获得玩家"+event.getPlayer().getName()+"的锁时发生异常！").printStackTrace();
+                }
                 if (lock==null) {
                     //这个sendMessage在1.18又不是过时的
                     event.getPlayer().spigot().sendMessage(ChatMessageType.ACTION_BAR,new TextComponent(ConfigBukkit.lang.玩家数据加载_等待信息.replaceAll("<数>", String.valueOf(time))));
@@ -137,6 +147,7 @@ public class PlayerDataManager implements Listener {
                 try {
                     byte[] data = lock.loadData();
                     //异步获得锁和数据之后在主线程加载到玩家上
+                    PlayerDataCaseLock finalLock = lock;
                     Bukkit.getScheduler().runTask(KnapsackToGo4.knapsackToGo4, () -> {
                         try {//防止接口出异常影响正常运行
                             PlayerData.playerDataSerialize.load(event.getPlayer(),data);
@@ -145,7 +156,7 @@ public class PlayerDataManager implements Listener {
                         }
                         //玩家数据加载完成
                         playerLoadRunMap.remove(event.getPlayer());
-                        playerLockMap.put(event.getPlayer(), lock);//完成这一条才算真的完成
+                        playerLockMap.put(event.getPlayer(), finalLock);//完成这一条才算真的完成
                         //加载完成任务
                         Queue<Runnable> queue = playerLoadFinishedToRunMap.remove(event.getPlayer());
                         if (queue!=null){
@@ -261,7 +272,11 @@ public class PlayerDataManager implements Listener {
     public void close() {
         new HashMap<>(playerLockMap).forEach((player, lockWork) -> {
             save(lockWork,serialize(player));
-            lockWork.unlock();
+            try {
+                lockWork.unlock();
+            }catch (Exception|Error e){
+                new DataUnLockError(e,"在为"+player.getName()+"解锁时发生异常！").printStackTrace();
+            }
         });
     }
 }

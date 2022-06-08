@@ -6,6 +6,7 @@ import cn.jja8.knapsackToGo4.bukkit.basic.PlayerDataSerialize;
 import cn.jja8.knapsackToGo4.bukkit.config.playerData.PlayerDataCaseType;
 import cn.jja8.knapsackToGo4.bukkit.config.playerData.PlayerDataSerializeType;
 import cn.jja8.knapsackToGo4.bukkit.error.ConfigLoadException;
+import cn.jja8.knapsackToGo4.bukkit.error.DataCloseError;
 import cn.jja8.knapsackToGo4.bukkit.error.NoOptions;
 import cn.jja8.patronSaint_2022_3_2_1244.allUsed.file.YamlConfig;
 
@@ -32,6 +33,8 @@ public class PlayerData {
             } catch (IllegalArgumentException e){
                 throw new NoOptions(e,"加载配置文件PlayerDataCase.yml中"+playerDataCase+"值不存在！");
             }
+        }else {
+            KnapsackToGo4.knapsackToGo4.getLogger().info("已加载数据容器扩展。["+playerDataCase.getClass().getName()+"]");
         }
         if (playerDataSerialize==null){
             String playerDataSerialize = null;
@@ -44,10 +47,17 @@ public class PlayerData {
             } catch (IllegalArgumentException e){
                 throw new NoOptions(e,"加载配置文件PlayerDataSerialize.yml中"+playerDataSerialize+"值不存在！");
             }
+        }else {
+            KnapsackToGo4.knapsackToGo4.getLogger().info("已加载数序列化方法扩展。["+playerDataSerialize.getClass().getName()+"]");
         }
     }
 
     static void close(){
-        if (playerDataCase!=null)playerDataCase.close();
+        try {
+            if (playerDataCase!=null)playerDataCase.close();
+        }catch (Error|Exception e){
+            new DataCloseError(e,"数据容器"+PlayerData.playerDataCase.getClass().getName()+"在关闭时发生异常！").printStackTrace();
+        }
+
     }
 }
