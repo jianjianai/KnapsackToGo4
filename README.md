@@ -15,7 +15,10 @@
 ## 自带的序列化方式
 - Yaml
 
-## 作者编写的扩展列表
+## 更多 
+使用扩展可以使插件支持更多的据存储同步方式和序列化方式
+
+作者编写的扩展列表：
 https://gitee.com/jja8/KnapsackToGo4Plugin/blob/master/README.md
 
 #  如何保证数据安全
