@@ -1,6 +1,4 @@
-package cn.jja8.knapsackToGo4.bukkit.basic;
-
-import org.bukkit.entity.Player;
+package cn.jja8.knapsackToGo4.all.basic;
 
 /**
  * 用于在同步的数据库中管理玩家数据

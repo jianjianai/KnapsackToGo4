@@ -1,6 +1,4 @@
-package cn.jja8.knapsackToGo4.bukkit.basic;
-
-import org.bukkit.entity.Player;
+package cn.jja8.knapsackToGo4.all.basic;
 
 /**
  * 玩家数据的序列化
@@ -13,5 +11,5 @@ public interface PlayerDataSerialize {
     /**
      * 将玩家的数据从序列化加载
      * */
-    void load(Player player, byte[] bytes);
+    void load(Player player,byte[] bytes);
 }
