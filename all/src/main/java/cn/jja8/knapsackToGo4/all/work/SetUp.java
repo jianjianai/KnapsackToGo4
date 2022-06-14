@@ -1,6 +1,4 @@
-package cn.jja8.knapsackToGo4.all.basic;
-
-import java.util.Objects;
+package cn.jja8.knapsackToGo4.all.work;
 
 /**
  * work的参数设置

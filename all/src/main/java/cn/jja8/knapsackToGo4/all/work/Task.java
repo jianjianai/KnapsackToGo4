@@ -1,4 +1,4 @@
-package cn.jja8.knapsackToGo4.all.basic;
+package cn.jja8.knapsackToGo4.all.work;
 
 public interface Task {
     /**
