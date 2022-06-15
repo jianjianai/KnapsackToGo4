@@ -15,3 +15,4 @@ public class SetUp {
     /** 锁检查间隔（毫秒） */
     public long LockDetectionInterval = 250;
 }
+
