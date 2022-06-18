@@ -1,5 +1,4 @@
 rootProject.name = 'KnapsackToGo4'
-include 'bukkit-old'
 include 'bukkit'
 include 'bungeecord'
 include 'all'
