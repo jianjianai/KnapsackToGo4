@@ -20,6 +20,7 @@ dependencies {
     implementation project(":all")
     implementation project(":bukkit")
     implementation project(":bungeecord")
+    implementation project(":sponge")
 }
 
 test {
