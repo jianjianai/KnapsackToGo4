@@ -88,6 +88,17 @@ public class Work {
         }
     }
 
+    public void close() {
+        new HashMap<>(playerLockMap).forEach((player, lockWork) -> {
+            save(lockWork,serialize(player));
+            try {
+                lockWork.unlock();
+            }catch (Exception|Error e){
+                new DataUnLockError(logger,e,"在为"+player.getName()+"解锁时发生异常！").printStackTrace();
+            }
+        });
+    }
+
     /**
      * 在玩家推出时调用此方法，使他开始工作
      * */
@@ -201,4 +212,6 @@ public class Work {
     public boolean isLoaded(Go4Player go4Player){
         return playerLockMap.containsKey(go4Player);
     }
+
+
 }

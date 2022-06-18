@@ -22,7 +22,7 @@ public class SqliteDataCase implements PlayerDataCase {
     private Task TaskTimer;
     private Logger logger;
 
-    private SqliteDataCase(SqliteDataCaseSetUp sqliteDataCaseSetUp, TaskManager taskManager, Logger logger) throws IOException, DatabaseConnectionException, SQLException {
+    public SqliteDataCase(SqliteDataCaseSetUp sqliteDataCaseSetUp, TaskManager taskManager, Logger logger) throws DatabaseConnectionException, SQLException {
         this.sqliteDataCaseSetUp = sqliteDataCaseSetUp;
         this.logger = logger;
         Connection connection = getConnection();

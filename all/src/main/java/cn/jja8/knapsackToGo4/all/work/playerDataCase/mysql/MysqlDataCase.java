@@ -19,7 +19,7 @@ public class MysqlDataCase implements PlayerDataCase {
     private Task TaskTimer;
     private Logger logger;
 
-    private MysqlDataCase(MysqlDataCaseSetUp mysqlDataCaseSetUp, TaskManager taskManager, Logger logger) throws IOException, DatabaseConnectionException, SQLException {
+    public MysqlDataCase(MysqlDataCaseSetUp mysqlDataCaseSetUp, TaskManager taskManager, Logger logger) throws DatabaseConnectionException, SQLException {
         this.mysqlDataCaseSetUp = mysqlDataCaseSetUp;
         this.logger = logger;
         Connection connection = getConnection();

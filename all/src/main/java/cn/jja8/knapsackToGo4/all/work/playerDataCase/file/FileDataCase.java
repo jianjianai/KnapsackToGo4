@@ -6,12 +6,11 @@ import cn.jja8.knapsackToGo4.all.work.PlayerDataCase;
 import cn.jja8.knapsackToGo4.all.work.PlayerDataCaseLock;
 
 import java.io.File;
-import java.io.IOException;
 
 public class FileDataCase implements PlayerDataCase {
     File dataFile;
     String serverName;
-    private FileDataCase(FileDataCaseSetUp fileDataCaseSetUp) throws IOException {
+    public FileDataCase(FileDataCaseSetUp fileDataCaseSetUp) {
         this.dataFile = new File(fileDataCaseSetUp.file);
         this.serverName = fileDataCaseSetUp.serverName;
         dataFile.mkdirs();
