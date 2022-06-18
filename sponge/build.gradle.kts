@@ -1,5 +1,9 @@
 import org.spongepowered.gradle.plugin.config.PluginLoaders
 import org.spongepowered.plugin.metadata.model.PluginDependency
+import java.text.SimpleDateFormat
+import java.util.Date
+
+
 
 plugins {
     `java-library`
@@ -9,16 +13,21 @@ plugins {
 group = "cn.jja8"
 version = "1.0-SNAPSHOT"
 
+
 repositories {
     mavenCentral()
 }
 
 sponge {
+    //获取当前时间作为版本号
+    val formatter = SimpleDateFormat("yyyy.MM.dd.HHmm")
+    val version = formatter.format(Date())+"-new";//"0.03"//
+
     apiVersion("9.0.0")
     license("All Rights Reserved")
     loader {
         name(PluginLoaders.JAVA_PLAIN)
-        version("1.0")
+        version(version)
     }
     plugin("knapsacktogo4") {
         displayName("KnapsackToGo4")

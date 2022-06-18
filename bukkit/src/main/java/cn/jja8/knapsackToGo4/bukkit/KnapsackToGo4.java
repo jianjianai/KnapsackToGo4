@@ -21,11 +21,21 @@ public class KnapsackToGo4 extends JavaPlugin{
     @Override
     public void onEnable() {
         knapsackToGo4 = this;
+        String v = "unknown";
+        try {
+            v = Bukkit.getServer().getClass().getName().split("\\.")[3];
+        }catch (Error|Exception ignored){}
+
         try {
             PlayerData.load();
         } catch (Error|Exception e) {
             getLogger().severe("插件加载时发生错误，已禁用！");
             e.printStackTrace();
+            getLogger().severe("插件无法启用，请参考上方报错排查问题。若需反馈请将上方报错完整提交。");
+            getLogger().severe("-------------------------------------------------------");
+            getLogger().severe("当前服务端版本："+v);
+            getLogger().severe("-------------------------------------------------------");
+            getLogger().severe("若有疑问，您可以前往 “PlugClub/插件实验室 - 820131534” 交流。");
             return;
 
         }
@@ -36,10 +46,21 @@ public class KnapsackToGo4 extends JavaPlugin{
         } catch (Error|IOException e) {
             getLogger().severe("插件加载时发生错误，已禁用！");
             new ConfigLoadError(e,"KnapsackToGo4SetUp.yaml配置文件加载出错").printStackTrace();
+            getLogger().severe("插件无法启用，请参考上方报错排查问题。若需反馈请将上方报错完整提交。");
+            getLogger().severe("-------------------------------------------------------");
+            getLogger().severe("当前服务端版本："+v);
+            getLogger().severe("-------------------------------------------------------");
+            getLogger().severe("若有疑问，您可以前往 “PlugClub/插件实验室 - 820131534” 交流。");
             return;
         }
 
         work = new BukkitWork(PlayerData.playerDataCase,PlayerData.playerDataSerialize,new BukkitTaskManager(this),setUp,getLogger());
+        Bukkit.getPluginManager().registerEvents(work,this);
+
+        getLogger().info("-------------------------------------------------------");
+        getLogger().info("当前服务端版本："+v);
+        getLogger().info("-------------------------------------------------------");
+        getLogger().info("若有疑问，您可以前往 “PlugClub/插件实验室 - 820131534” 交流。");
 
 
         //解决热重载玩家数据不加载的问题

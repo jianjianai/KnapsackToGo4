@@ -17,7 +17,6 @@ import org.spongepowered.plugin.builtin.jvm.Plugin;
  */
 @Plugin("KnapsackToGo4")
 public class KnapsackToGo4 {
-
     private final PluginContainer container;
     private final Logger logger;
 
