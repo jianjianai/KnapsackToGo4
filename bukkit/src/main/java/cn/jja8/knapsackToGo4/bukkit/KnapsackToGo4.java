@@ -32,7 +32,7 @@ public class KnapsackToGo4 extends JavaPlugin{
 
         SetUp setUp;
         try {
-            setUp = YamlConfig.loadFromFile(new File(getDataFolder(),"KnapsackToGo4SetUp.yaml"),new SetUp());
+            setUp = YamlConfig.loadFromFile(new File(getDataFolder(),"KnapsackToGo4SetUp.yml"),new SetUp());
         } catch (Error|IOException e) {
             getLogger().severe("插件加载时发生错误，已禁用！");
             new ConfigLoadError(e,"KnapsackToGo4SetUp.yaml配置文件加载出错").printStackTrace();

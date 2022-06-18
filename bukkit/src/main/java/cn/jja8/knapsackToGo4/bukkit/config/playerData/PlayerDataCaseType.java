@@ -25,11 +25,11 @@ public enum PlayerDataCaseType {
             switch (this){
                 default:return null;
                 case File:
-                    return new FileDataCase(YamlConfig.loadFromFile(new File(KnapsackToGo4.knapsackToGo4.getDataFolder(),"FileDataCaseSetUp.yaml"),new FileDataCaseSetUp()));
+                    return new FileDataCase(YamlConfig.loadFromFile(new File(KnapsackToGo4.knapsackToGo4.getDataFolder(),"FileDataCaseSetUp.yml"),new FileDataCaseSetUp()));
                 case Sqlite:
-                    return new SqliteDataCase(YamlConfig.loadFromFile(new File(KnapsackToGo4.knapsackToGo4.getDataFolder(),"SqliteDataCaseSetUp.yaml"),new SqliteDataCaseSetUp()),new BukkitTaskManager(KnapsackToGo4.knapsackToGo4),KnapsackToGo4.knapsackToGo4.getLogger());
+                    return new SqliteDataCase(YamlConfig.loadFromFile(new File(KnapsackToGo4.knapsackToGo4.getDataFolder(),"SqliteDataCaseSetUp.yml"),new SqliteDataCaseSetUp()),new BukkitTaskManager(KnapsackToGo4.knapsackToGo4),KnapsackToGo4.knapsackToGo4.getLogger());
                 case Mysql:
-                    return new MysqlDataCase(YamlConfig.loadFromFile(new File(KnapsackToGo4.knapsackToGo4.getDataFolder(),"MysqlDataCaseSetUp.yaml"),new MysqlDataCaseSetUp()),new BukkitTaskManager(KnapsackToGo4.knapsackToGo4),KnapsackToGo4.knapsackToGo4.getLogger());
+                    return new MysqlDataCase(YamlConfig.loadFromFile(new File(KnapsackToGo4.knapsackToGo4.getDataFolder(),"MysqlDataCaseSetUp.yml"),new MysqlDataCaseSetUp()),new BukkitTaskManager(KnapsackToGo4.knapsackToGo4),KnapsackToGo4.knapsackToGo4.getLogger());
             }
         }catch (Error|Exception e){
             throw new DataCaseLoadError("数据容器加载出错！");
