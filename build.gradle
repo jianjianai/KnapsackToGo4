@@ -7,6 +7,11 @@ plugins {
 group 'cn.jja8.knapsackToGo4'
 version '1.0-SNAPSHOT'
 
+//获取当前时间作为版本号
+SimpleDateFormat formatter = new SimpleDateFormat("yyyy.MM.dd.HHmm")
+//设置版本号
+version = formatter.format(new Date())+"-new";//"0.03"//
+
 repositories {
     mavenCentral()
 }
@@ -22,10 +27,6 @@ test {
 }
 
 jar.doFirst {
-    //获取当前时间作为版本号
-    SimpleDateFormat formatter = new SimpleDateFormat("yyyy.MM.dd.HHmm")
-    //设置版本号
-    version = formatter.format(new Date())+"-new";//"0.03"//
     //替换配置文件版本号
     Iterator<File> 文件列表 = fileTree(dir: "${projectDir}/build/resources/main/", includes: ['*yml']).getFiles().iterator()
     while (文件列表.hasNext()) {
