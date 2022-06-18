@@ -31,7 +31,7 @@ public class Work {
         this.setUp = setUp;
         this.logger = logger;
         //自动保存
-        taskManager.runCircularTask(1000 * setUp.LockDetectionInterval, () -> {
+        taskManager.runCircularTask(1000 * setUp.AutoSave, () -> {
             playerLockMap.forEach((go4Player, playerDataCaseLock) -> {
                 taskManager.runSynchronization(() -> {
                     //主线程获取玩家数据
@@ -198,7 +198,7 @@ public class Work {
             }
         }
         PlayerJoin playerJoin = new PlayerJoin();
-        Task task = taskManager.runCircularTask(setUp.LockDetectionInterval*1000,playerJoin);
+        Task task = taskManager.runCircularTask(setUp.LockDetectionInterval,playerJoin);
         playerLoadRunMap.put(go4Player,task);
         playerJoin.setTask(task);
 

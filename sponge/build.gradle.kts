@@ -68,3 +68,8 @@ tasks.withType(AbstractArchiveTask::class).configureEach {
     isReproducibleFileOrder = true
     isPreserveFileTimestamps = false
 }
+
+
+dependencies {
+    compileOnly(project(":all"))
+}

@@ -14,5 +14,7 @@ public class SetUp {
     public Lang lang = new Lang();
     /** 锁检查间隔（毫秒） */
     public long LockDetectionInterval = 250;
+    /** 自动保存（单位秒） **/
+    public long AutoSave = 250;
 }
 
