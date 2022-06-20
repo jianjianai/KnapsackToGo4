@@ -29,7 +29,7 @@ public class PlayerData {
             try {
                 playerDataCase = YamlConfig.loadFromFile(new File(KnapsackToGo4.knapsackToGo4.getDataFolder(),"PlayerDataCase.yml"),new PlayerDataCaseString()).playerDataCaseType;
                 PlayerDataCaseType playerDataCaseType = PlayerDataCaseType.valueOf(playerDataCase);
-                PlayerData.playerDataCase = playerDataCaseType.getFileDataCase();
+                PlayerData.playerDataCase = playerDataCaseType.getDataCase();
             } catch (IOException e) {
                 throw new ConfigLoadException(e,"加载配置文件PlayerDataCase.yml出错");
             } catch (IllegalArgumentException e){

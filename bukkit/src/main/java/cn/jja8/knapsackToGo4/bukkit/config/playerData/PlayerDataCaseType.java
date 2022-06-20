@@ -20,7 +20,7 @@ public enum PlayerDataCaseType {
     Mysql;
 
 
-    public PlayerDataCase getFileDataCase() throws DataCaseLoadError {
+    public PlayerDataCase getDataCase() throws DataCaseLoadError {
         try{
             switch (this){
                 default:return null;
@@ -32,7 +32,7 @@ public enum PlayerDataCaseType {
                     return new MysqlDataCase(YamlConfig.loadFromFile(new File(KnapsackToGo4.knapsackToGo4.getDataFolder(),"MysqlDataCaseSetUp.yml"),new MysqlDataCaseSetUp()),new BukkitTaskManager(KnapsackToGo4.knapsackToGo4),KnapsackToGo4.knapsackToGo4.getLogger());
             }
         }catch (Error|Exception e){
-            throw new DataCaseLoadError("数据容器加载出错！");
+            throw new DataCaseLoadError(e,"数据容器加载出错！");
         }
 
     }
