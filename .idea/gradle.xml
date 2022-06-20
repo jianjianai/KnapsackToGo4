@@ -12,7 +12,6 @@
             <option value="$PROJECT_DIR$/all" />
             <option value="$PROJECT_DIR$/bukkit" />
             <option value="$PROJECT_DIR$/bungeecord" />
-            <option value="$PROJECT_DIR$/sponge" />
           </set>
         </option>
       </GradleProjectSettings>
