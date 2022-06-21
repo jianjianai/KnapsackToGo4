@@ -1,0 +1,70 @@
+import java.text.SimpleDateFormat
+
+plugins {
+    id 'java'
+    id "org.spongepowered.gradle.plugin" version "2.0.2"
+}
+
+compileJava.options.encoding = 'UTF-8'
+//设置版本号
+version = new SimpleDateFormat("yyyy.MM.dd.HHmm").format(new Date())+"-new";//"0.03"//
+String loaderVersion  = new SimpleDateFormat("yyyy.MM.dd").format(new Date())+"-new";//"0.03"//
+
+group 'cn.jja8.knapsackToGo4'
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+
+sponge {
+    apiVersion("8.0.0")
+    loader {
+        name("knapsackToGo4")
+        version(loaderVersion)
+    }
+    license("CHANGEME")
+    plugin("knapsacktogo4"){
+        displayName("knapsackToGo4")
+        entrypoint("cn.jja8.knapsackToGo4.sponge.KnapsackToGo4")
+        description("强大的跨服数据同步插件第4代。")
+        links {
+            homepage("https://gitee.com/jja8/KnapsackToGo4")
+            source("https://gitee.com/jja8/KnapsackToGo4/releases")
+            issues("https://gitee.com/jja8/KnapsackToGo4/issues")
+        }
+        contributor("jianjianai") {
+            description("简简爱")
+        }
+    }
+}
+
+dependencies {
+    compileOnly 'org.spongepowered:spongeapi:8.0.0'
+    implementation project(":all")
+}
+
+test {
+    useJUnitPlatform()
+}
+
+jar{
+    //将依赖植入jar包
+    from {
+        configurations.runtimeClasspath.collect {
+            setDuplicatesStrategy(DuplicatesStrategy.EXCLUDE)
+            it.isDirectory() ? it : zipTree(it)
+        }
+    }
+}
+
+jar.doLast{
+
+    new File(new File(getBuildDir(),getLibsDirName()),project.name+"-"+version+".jar")
+            .renameTo(
+                    new File(new File(getBuildDir(),getLibsDirName()),"knapsackToGo4-"+project.name+"-"+version+".jar")
+            )
+}
