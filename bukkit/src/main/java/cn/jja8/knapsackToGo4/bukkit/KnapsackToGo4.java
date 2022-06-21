@@ -3,6 +3,7 @@ package cn.jja8.knapsackToGo4.bukkit;
 import cn.jja8.knapsackToGo4.all.work.SetUp;
 import cn.jja8.knapsackToGo4.bukkit.error.ConfigLoadError;
 import cn.jja8.knapsackToGo4.bukkit.work.BukkitGo4Player;
+import cn.jja8.knapsackToGo4.bukkit.work.BukkitLogger;
 import cn.jja8.knapsackToGo4.bukkit.work.BukkitTaskManager;
 import cn.jja8.knapsackToGo4.bukkit.work.BukkitWork;
 import cn.jja8.patronSaint_2022_3_2_1244.allUsed.file.YamlConfig;
@@ -54,7 +55,7 @@ public class KnapsackToGo4 extends JavaPlugin{
             return;
         }
 
-        work = new BukkitWork(PlayerData.playerDataCase,PlayerData.playerDataSerialize,new BukkitTaskManager(this),setUp,getLogger());
+        work = new BukkitWork(PlayerData.playerDataCase,PlayerData.playerDataSerialize,new BukkitTaskManager(this),setUp,new BukkitLogger(getLogger()));
         Bukkit.getPluginManager().registerEvents(work,this);
 
         getLogger().info("-------------------------------------------------------");

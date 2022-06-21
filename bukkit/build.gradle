@@ -14,7 +14,7 @@ repositories {
 
 
 dependencies {
-    compileOnly project(":all")
+    implementation project(":all")
     implementation fileTree(dir:'libs/implentation',includes:['*jar'])
     compileOnly fileTree(dir:'libs/compileonly',includes:['*jar'])
 }

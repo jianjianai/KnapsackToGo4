@@ -10,14 +10,12 @@ import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.*;
 
-import java.util.logging.Logger;
-
 public class BukkitWork extends Work implements Listener {
     /**
      * 构造使其开始工作，全程应该只使用一个对象。
      */
-    public BukkitWork(PlayerDataCase playerDataCase, PlayerDataSerialize playerDataSerialize, TaskManager taskManager, SetUp setUp, Logger logger) {
-        super(playerDataCase, playerDataSerialize, taskManager, setUp, logger);
+    public BukkitWork(PlayerDataCase playerDataCase, PlayerDataSerialize playerDataSerialize, TaskManager taskManager, SetUp setUp, BukkitLogger logger) {
+        super(playerDataCase, playerDataSerialize, taskManager, setUp,logger);
     }
 
     @EventHandler

@@ -13,7 +13,7 @@ repositories {
 
 
 dependencies {
-    implementation fileTree(dir:'libs/implentation',includes:['*jar'])
+    apiElements fileTree(dir:'libs/api',includes:['*jar'])
     compileOnly fileTree(dir:'libs/compileonly',includes:['*jar'])
 }
 

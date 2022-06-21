@@ -1,6 +1,7 @@
 package cn.jja8.knapsackToGo4.all.work.error;
 
-import java.util.logging.Logger;
+
+import cn.jja8.knapsackToGo4.all.work.Logger;
 
 public class DataUnSerializeError extends KnapsackToGo4Error{
     public DataUnSerializeError(Logger logger, String message) {
