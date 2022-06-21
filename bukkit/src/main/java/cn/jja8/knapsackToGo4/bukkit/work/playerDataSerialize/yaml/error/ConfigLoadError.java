@@ -1,14 +1,14 @@
 package cn.jja8.knapsackToGo4.bukkit.work.playerDataSerialize.yaml.error;
 
-import cn.jja8.knapsackToGo4.all.work.error.KnapsackToGo4Error;
-import cn.jja8.knapsackToGo4.bukkit.KnapsackToGo4;
+import cn.jja8.knapsackToGo4.bukkit.error.BukkitKnapsackToGo4Error;
 
-public class ConfigLoadError extends KnapsackToGo4Error {
+public class ConfigLoadError extends BukkitKnapsackToGo4Error {
+
     public ConfigLoadError(String message) {
-        super(KnapsackToGo4.knapsackToGo4.getLogger(),message);
+        super(message);
     }
 
     public ConfigLoadError(Throwable cause, String message) {
-        super(KnapsackToGo4.knapsackToGo4.getLogger(),cause, message);
+        super(cause, message);
     }
 }

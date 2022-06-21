@@ -2,7 +2,7 @@ package cn.jja8.knapsackToGo4.all.work.playerDataCase.mysql.error;
 
 import cn.jja8.knapsackToGo4.all.work.error.KnapsackToGo4Exception;
 
-import java.util.logging.Logger;
+import cn.jja8.knapsackToGo4.all.work.Logger;
 
 /**
  * 数据库连接失败异常

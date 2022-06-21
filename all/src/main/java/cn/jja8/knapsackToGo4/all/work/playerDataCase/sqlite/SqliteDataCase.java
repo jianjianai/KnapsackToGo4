@@ -7,10 +7,9 @@ import cn.jja8.knapsackToGo4.all.work.TaskManager;
 import cn.jja8.knapsackToGo4.all.work.playerDataCase.sqlite.error.DatabaseConnectionException;
 import cn.jja8.knapsackToGo4.all.work.playerDataCase.sqlite.error.UpdateLockError;
 
-import java.io.IOException;
 import java.sql.*;
 import java.util.UUID;
-import java.util.logging.Logger;
+import cn.jja8.knapsackToGo4.all.work.Logger;
 
 public class SqliteDataCase implements PlayerDataCase {
     static public final String NULL = "NULL";

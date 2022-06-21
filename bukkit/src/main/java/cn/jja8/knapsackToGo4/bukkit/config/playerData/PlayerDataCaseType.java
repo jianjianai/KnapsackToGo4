@@ -9,6 +9,7 @@ import cn.jja8.knapsackToGo4.all.work.playerDataCase.sqlite.SqliteDataCase;
 import cn.jja8.knapsackToGo4.all.work.playerDataCase.sqlite.SqliteDataCaseSetUp;
 import cn.jja8.knapsackToGo4.bukkit.KnapsackToGo4;
 import cn.jja8.knapsackToGo4.bukkit.error.DataCaseLoadError;
+import cn.jja8.knapsackToGo4.bukkit.work.BukkitLogger;
 import cn.jja8.knapsackToGo4.bukkit.work.BukkitTaskManager;
 import cn.jja8.patronSaint_2022_3_2_1244.allUsed.file.YamlConfig;
 
@@ -27,9 +28,9 @@ public enum PlayerDataCaseType {
                 case File:
                     return new FileDataCase(YamlConfig.loadFromFile(new File(KnapsackToGo4.knapsackToGo4.getDataFolder(),"FileDataCaseSetUp.yml"),new FileDataCaseSetUp()));
                 case Sqlite:
-                    return new SqliteDataCase(YamlConfig.loadFromFile(new File(KnapsackToGo4.knapsackToGo4.getDataFolder(),"SqliteDataCaseSetUp.yml"),new SqliteDataCaseSetUp()),new BukkitTaskManager(KnapsackToGo4.knapsackToGo4),KnapsackToGo4.knapsackToGo4.getLogger());
+                    return new SqliteDataCase(YamlConfig.loadFromFile(new File(KnapsackToGo4.knapsackToGo4.getDataFolder(),"SqliteDataCaseSetUp.yml"),new SqliteDataCaseSetUp()),new BukkitTaskManager(KnapsackToGo4.knapsackToGo4),new BukkitLogger(KnapsackToGo4.knapsackToGo4.getLogger()));
                 case Mysql:
-                    return new MysqlDataCase(YamlConfig.loadFromFile(new File(KnapsackToGo4.knapsackToGo4.getDataFolder(),"MysqlDataCaseSetUp.yml"),new MysqlDataCaseSetUp()),new BukkitTaskManager(KnapsackToGo4.knapsackToGo4),KnapsackToGo4.knapsackToGo4.getLogger());
+                    return new MysqlDataCase(YamlConfig.loadFromFile(new File(KnapsackToGo4.knapsackToGo4.getDataFolder(),"MysqlDataCaseSetUp.yml"),new MysqlDataCaseSetUp()),new BukkitTaskManager(KnapsackToGo4.knapsackToGo4),new BukkitLogger(KnapsackToGo4.knapsackToGo4.getLogger()));
             }
         }catch (Error|Exception e){
             throw new DataCaseLoadError(e,"数据容器加载出错！");

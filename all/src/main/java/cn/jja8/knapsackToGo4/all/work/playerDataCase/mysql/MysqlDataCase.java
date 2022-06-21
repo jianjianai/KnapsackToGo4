@@ -4,10 +4,9 @@ import cn.jja8.knapsackToGo4.all.work.*;
 import cn.jja8.knapsackToGo4.all.work.playerDataCase.mysql.error.DatabaseConnectionException;
 import cn.jja8.knapsackToGo4.all.work.playerDataCase.mysql.error.UpdateLockError;
 
-import java.io.IOException;
 import java.sql.*;
 import java.util.UUID;
-import java.util.logging.Logger;
+import cn.jja8.knapsackToGo4.all.work.Logger;
 
 public class MysqlDataCase implements PlayerDataCase {
     static public final String NULL = "NULL";
