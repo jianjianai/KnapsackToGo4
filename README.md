@@ -82,21 +82,16 @@ PlayerDataSerialize.yml是数据序列化，是表示数据的方式。一旦设
 ## 关于配置文件
 
 ### 核心配置文件
-lang.yml、playerDataConfig.yml和ServerConfig.yml是插件核心逻辑的配置文件。这三个配置保持默认就行，一般不需要修改。
-- lang.yml 语言文件
-- playerDataConfig.yml 玩家数据管理配置
-- ServerConfig.yml 服务器配置
+KnapsackToGo4SetUp.yml 是插件核心逻辑的配置文件。保持默认就行，一般不需要修改。
+- KnapsackToGo4SetUp.yml 插件初始化配置文件。
 
 playerDataConfig.yml
 ~~~yaml
-玩家数据加载前保持背包为空: false  #在数据同步加载之前清空玩家背包，不建议开启。
-玩家数据解锁检测间隙: 5  #如果玩家数据被其他服务器上锁，那么多久去看一下是否被解锁。这个操作是在异步的，不会卡服务器。
-自动保存时间: 600 #自动保存玩家数据，防止服务器突然崩溃数据没保存。
-~~~
-
-ServerConfig.yml
-~~~yaml
-serverName: null  #没什么用，就是好看
+AutoSave: 250   #自动保存时间，单位是秒
+LockDetectionInterval: 250   #查询锁间隔，单位是毫秒
+lang: #语言
+  isLoading: 正在加载你的数据，请稍等..<数>
+  loadingFinish: 欢迎！
 ~~~
 
 ### 其他配置文件
