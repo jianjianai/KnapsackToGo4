@@ -87,6 +87,9 @@ public class Work {
         }
     }
 
+    /**
+     * 关闭是调用此方法
+     * */
     public void close() {
         new HashMap<>(playerLockMap).forEach((player, lockWork) -> {
             save(lockWork,serialize(player));

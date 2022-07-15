@@ -43,8 +43,8 @@ sponge {
 }
 
 dependencies {
-    compileOnly 'org.spongepowered:spongeapi:8.0.0'
     implementation project(":all")
+//    compileOnly 'org.spongepowered:spongeapi:8.0.0'
 }
 
 test {

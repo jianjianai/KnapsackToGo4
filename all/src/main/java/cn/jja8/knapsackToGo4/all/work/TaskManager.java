@@ -12,7 +12,7 @@ public interface TaskManager {
      * */
     void runAsynchronous(Runnable runnable);
     /**
-     * 运行循环任务
+     * 运行循环任务,通常是异步的
      * @param time （单位毫秒）多久循环一次。
      * */
     Task runCircularTask(long time,Runnable runnable);
