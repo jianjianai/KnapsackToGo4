@@ -45,6 +45,7 @@ public class YamlDataSerialize implements PlayerDataSerialize {
         if (c.Health) yamlDataSerializePartSet.add(new Health(c.MaxHealth));
         if (c.Inventory) yamlDataSerializePartSet.add(new Inventory());
         if (c.PotionEffects) yamlDataSerializePartSet.add(new PotionEffects());
+        if (c.Location) yamlDataSerializePartSet.add(new Location());
     }
 
     @Override

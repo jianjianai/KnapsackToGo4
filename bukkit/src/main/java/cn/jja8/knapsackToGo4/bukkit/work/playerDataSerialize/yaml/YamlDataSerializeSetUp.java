@@ -8,4 +8,5 @@ public class YamlDataSerializeSetUp {
     public boolean Health = true,MaxHealth = true;
     public boolean Inventory = true;
     public boolean PotionEffects = true;
+    public boolean Location = false;
 }
