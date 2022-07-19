@@ -6,6 +6,8 @@ package cn.jja8.knapsackToGo4.all.work;
 public interface PlayerDataCase {
     /**
      * 获得这个玩家的锁
+     *
+     * 如果调用此方法的的实现抛出异常会自动重试
      * @return null 此玩家已经被锁
      * */
     PlayerDataCaseLock getPlayerDataLock(Go4Player go4Player);

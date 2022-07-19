@@ -55,12 +55,17 @@ public class Work {
     /**
      * 保存玩家数据
      * */
-    private void save(PlayerDataCaseLock playerDataCaseLock,byte[] data) throws DataSaveError{
-        try {
-            playerDataCaseLock.saveData(data);
-        }catch (Exception|Error e){
-            throw new DataSaveError(logger,e,"玩家数据序保存错误！");
+    private void save(PlayerDataCaseLock playerDataCaseLock,byte[] data){
+        for (int i = 0; i < 10; i++) {
+            try {
+                playerDataCaseLock.saveData(data);
+                return;
+            } catch (Exception | Error e) {
+                new DataSaveError(logger, e, "玩家数据序保存错误！"+(i==0?"":"重试第"+i+"次")).printStackTrace();
+                try {Thread.sleep(1000);} catch (InterruptedException ignored) {}
+            }
         }
+        throw new DataSaveError(logger, "玩家数据序保存错误！重试10次全部失败。");
     }
 
 
@@ -127,12 +132,17 @@ public class Work {
                 if (finalData !=null){
                     save(lock,finalData);
                 }
-                try {
-                    lock.unlock();
-                }catch (Exception|Error e){
-                    new DataUnLockError(logger,e,"在为"+ go4Player.getName()+"解锁时发生异常！").printStackTrace();
-                }
 
+                for (int i = 0; i < 10; i++) {
+                    try {
+                        lock.unlock();
+                        return;
+                    } catch (Exception | Error e) {
+                        new DataSaveError(logger, e, "在为"+ go4Player.getName()+"解锁时发生异常！"+(i==0?"":"重试第"+i+"次")).printStackTrace();
+                        try {Thread.sleep(1000);} catch (InterruptedException ignored) {}
+                    }
+                }
+                throw new DataSaveError(logger, "在为"+ go4Player.getName()+"解锁时发生异常！重试10次全部失败。");
             });
         }
     }
@@ -143,26 +153,27 @@ public class Work {
         class PlayerJoin implements Runnable{
             Task task;
             int time = 0;
+            PlayerDataCaseLock lock = null;
             void setTask(Task task){
                 this.task = task;
             }
             @Override
             public void run() {
-                PlayerDataCaseLock lock = null;
-                try {
-                    lock = playerDataCase.getPlayerDataLock(go4Player);
-                }catch (Exception|Error e){
-                    new DataGetLockError(logger,e,"在获得玩家"+ go4Player.getName()+"的锁时发生异常！").printStackTrace();
+                //这个sendMessage在1.18又不是过时的
+                go4Player.loadingMessage(setUp.lang.isLoading.replaceAll("<数>", String.valueOf(time)));
+                time++;
+
+                if (lock==null){
+                    try {
+                        lock = playerDataCase.getPlayerDataLock(go4Player);
+                    }catch (Exception|Error e){
+                        new DataGetLockError(logger,e,"在获得玩家"+ go4Player.getName()+"的锁时发生异常！").printStackTrace();
+                    }
                 }
-                if (lock==null) {
-                    //这个sendMessage在1.18又不是过时的
-                    go4Player.loadingMessage(setUp.lang.isLoading.replaceAll("<数>", String.valueOf(time)));
-                    time++;
-                    return;
-                }
-                task.cancel();
                 try {
-                    byte[] data = lock.loadData();
+                    byte[] data = lock.loadData();//如果抛出异常则会下次再来
+                    task.cancel();//得到数据后取消任务
+
                     //异步获得锁和数据之后在主线程加载到玩家上
                     PlayerDataCaseLock finalLock = lock;
                     taskManager.runSynchronization(() -> {
