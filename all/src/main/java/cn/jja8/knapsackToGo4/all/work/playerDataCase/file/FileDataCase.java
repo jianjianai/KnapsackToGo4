@@ -2,6 +2,7 @@ package cn.jja8.knapsackToGo4.all.work.playerDataCase.file;
 
 import cn.jja8.knapsackToGo4.all.veryUtil.FileLock;
 import cn.jja8.knapsackToGo4.all.work.Go4Player;
+import cn.jja8.knapsackToGo4.all.work.Logger;
 import cn.jja8.knapsackToGo4.all.work.PlayerDataCase;
 import cn.jja8.knapsackToGo4.all.work.PlayerDataCaseLock;
 
@@ -10,7 +11,14 @@ import java.io.File;
 public class FileDataCase implements PlayerDataCase {
     File dataFile;
     String serverName;
-    public FileDataCase(FileDataCaseSetUp fileDataCaseSetUp) {
+    Logger logger;
+
+    public Logger getLogger() {
+        return logger;
+    }
+
+    public FileDataCase(FileDataCaseSetUp fileDataCaseSetUp, Logger logger) {
+        this.logger = logger;
         this.dataFile = new File(fileDataCaseSetUp.file);
         this.serverName = fileDataCaseSetUp.serverName;
         dataFile.mkdirs();
@@ -24,7 +32,7 @@ public class FileDataCase implements PlayerDataCase {
         if (fileLock==null){
             return null;
         }
-        return new FileDataCaseLock(playerDataFile,fileLock);
+        return new FileDataCaseLock(this,playerDataFile,fileLock);
     }
 
     @Override

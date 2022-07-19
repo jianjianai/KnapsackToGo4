@@ -2,13 +2,17 @@ package cn.jja8.knapsackToGo4.all.work.playerDataCase.file;
 
 import cn.jja8.knapsackToGo4.all.veryUtil.FileLock;
 import cn.jja8.knapsackToGo4.all.work.PlayerDataCaseLock;
+import cn.jja8.knapsackToGo4.all.work.playerDataCase.file.error.WriteDataError;
+import cn.jja8.knapsackToGo4.all.work.playerDataCase.sqlite.error.LoadDataError;
 
 import java.io.*;
 
 public class FileDataCaseLock implements PlayerDataCaseLock {
+    FileDataCase fileDataCase;
     File playerDataFile;
     FileLock fileLock;
-    public FileDataCaseLock(File playerDataFile, FileLock fileLock) {
+    public FileDataCaseLock(FileDataCase fileDataCase, File playerDataFile, FileLock fileLock) {
+        this.fileDataCase = fileDataCase;
         this.playerDataFile = playerDataFile;
         this.fileLock = fileLock;
     }
@@ -18,21 +22,21 @@ public class FileDataCaseLock implements PlayerDataCaseLock {
         try {
             playerDataFile.createNewFile();
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new WriteDataError(fileDataCase.getLogger(),e,"创建文件失败！");
         }
         FileOutputStream fileOutputStream = null;
         try {
             fileOutputStream = new FileOutputStream(playerDataFile);
             fileOutputStream.write(bytes);
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            throw new WriteDataError(fileDataCase.getLogger(),e,"意想不到的错误！");
         } catch (IOException e) {
             try {
                 fileOutputStream.close();
             } catch (IOException ex) {
                 ex.printStackTrace();
             }
-            e.printStackTrace();
+            throw new WriteDataError(fileDataCase.getLogger(),e,"文件写入错误！");
         }
 
     }
@@ -55,7 +59,7 @@ public class FileDataCaseLock implements PlayerDataCaseLock {
                 data=byteArrayOutputStream.toByteArray();
                 byteArrayOutputStream.close();
             } catch (FileNotFoundException e) {
-                e.printStackTrace();
+                throw new LoadDataError(fileDataCase.getLogger(),e,"意想不到的错误！");
             } catch (IOException e) {
                 try {
                     inputStream.close();
@@ -67,7 +71,7 @@ public class FileDataCaseLock implements PlayerDataCaseLock {
                 } catch (IOException ex) {
                     ex.printStackTrace();
                 }
-                e.printStackTrace();
+                throw new LoadDataError(fileDataCase.getLogger(),e,"文件读取错误！");
             }
             return data;
         }else {

@@ -1,7 +1,7 @@
 package cn.jja8.knapsackToGo4.all.work.playerDataCase.sqlite;
 
 import cn.jja8.knapsackToGo4.all.work.PlayerDataCaseLock;
-import cn.jja8.knapsackToGo4.all.work.playerDataCase.sqlite.error.DatabaseConnectionException;
+import cn.jja8.knapsackToGo4.all.work.playerDataCase.sqlite.error.*;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -28,7 +28,7 @@ public class SqliteDataCaseLock implements PlayerDataCaseLock {
             preparedStatement.setString(2,playerUUid);
             preparedStatement.executeUpdate();
         } catch (DatabaseConnectionException | SQLException e) {
-            e.printStackTrace();
+            throw new UpdateDataError(sqliteDataCase.getLogger(),e,"数据库更新出错！");
         }
     }
 
@@ -42,12 +42,13 @@ public class SqliteDataCaseLock implements PlayerDataCaseLock {
             try (ResultSet resultSet = preparedStatement.executeQuery()){
                 if (resultSet.next()){
                     return resultSet.getBytes(1);
+                }else {
+                    return null;
                 }
             }
         } catch (DatabaseConnectionException | SQLException e) {
-            e.printStackTrace();
+            throw new LoadDataError(sqliteDataCase.getLogger(),e,"数据库查询出错！");
         }
-        return null;
     }
 
     @Override
@@ -60,7 +61,7 @@ public class SqliteDataCaseLock implements PlayerDataCaseLock {
             preparedStatement.setString(2,playerUUid);
             preparedStatement.executeUpdate();
         } catch (DatabaseConnectionException | SQLException e) {
-            e.printStackTrace();
+            throw new UpdateDataError(sqliteDataCase.getLogger(),e,"数据库更新出错！");
         }
     }
 }

@@ -4,8 +4,7 @@ import cn.jja8.knapsackToGo4.all.work.Go4Player;
 import cn.jja8.knapsackToGo4.all.work.PlayerDataCase;
 import cn.jja8.knapsackToGo4.all.work.Task;
 import cn.jja8.knapsackToGo4.all.work.TaskManager;
-import cn.jja8.knapsackToGo4.all.work.playerDataCase.sqlite.error.DatabaseConnectionException;
-import cn.jja8.knapsackToGo4.all.work.playerDataCase.sqlite.error.UpdateLockError;
+import cn.jja8.knapsackToGo4.all.work.playerDataCase.sqlite.error.*;
 
 import java.sql.*;
 import java.util.UUID;
@@ -20,6 +19,10 @@ public class SqliteDataCase implements PlayerDataCase {
     public final String lockUUID = UUID.randomUUID().toString();
     private Task TaskTimer;
     private Logger logger;
+
+    public Logger getLogger() {
+        return logger;
+    }
 
     public SqliteDataCase(SqliteDataCaseSetUp sqliteDataCaseSetUp, TaskManager taskManager, Logger logger) throws DatabaseConnectionException, SQLException {
         this.sqliteDataCaseSetUp = sqliteDataCaseSetUp;
@@ -47,7 +50,7 @@ public class SqliteDataCase implements PlayerDataCase {
         try {
             return DriverManager.getConnection(sqliteDataCaseSetUp.dataBaseURL, sqliteDataCaseSetUp.userName, sqliteDataCaseSetUp.PassWord);
         } catch (SQLException e) {
-            throw new DatabaseConnectionException(logger,e,"数据库连接失败，请检查dataBaseURL，userName，PassWord是否正确。");
+            throw new DatabaseConnectionException(getLogger(),e,"数据库连接失败，请检查dataBaseURL，userName，PassWord是否正确。");
         }
     }
 
@@ -74,7 +77,7 @@ public class SqliteDataCase implements PlayerDataCase {
                 }
             }
         } catch (DatabaseConnectionException | SQLException e) {
-            throw new UpdateLockError(logger,e,"更新锁失败，可能造成数据丢失。请尽快关闭服务器！");
+            throw new UpdateLockError(getLogger(),e,"更新锁失败，可能造成数据丢失。请尽快关闭服务器！");
         }
     }
 
@@ -88,7 +91,7 @@ public class SqliteDataCase implements PlayerDataCase {
             del.setString(1,lockUUID);
             del.executeUpdate();
         } catch (DatabaseConnectionException | SQLException e) {
-            throw new UpdateLockError(logger,e, "解锁失败，可能造成数据丢失。");
+            throw new UpdateLockError(getLogger(),e, "解锁失败，可能造成数据丢失。");
         }
     }
 
@@ -133,12 +136,13 @@ public class SqliteDataCase implements PlayerDataCase {
                 update.setString(3,player.getUUID().toString());
                 if (update.executeUpdate()>=1) {
                     return new SqliteDataCaseLock(this,player.getUUID().toString(),lockUUID);//成功拿到锁
+                }else {
+                    return null;
                 }
             }
         } catch (DatabaseConnectionException | SQLException e) {
-            e.printStackTrace();
+            throw new LoadDataError(getLogger(),e,"数据库查询出错！");
         }
-        return null;
     }
 
     @Override
@@ -174,10 +178,10 @@ public class SqliteDataCase implements PlayerDataCase {
                     }
                 }
             }
+            return null;
         } catch (DatabaseConnectionException | SQLException e) {
-            e.printStackTrace();
+            throw new LoadDataError(getLogger(),e,"数据库查询出错！");
         }
-        return null;
     }
 
 

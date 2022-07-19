@@ -2,6 +2,7 @@ package cn.jja8.knapsackToGo4.all.work.playerDataCase.mysql;
 
 import cn.jja8.knapsackToGo4.all.work.*;
 import cn.jja8.knapsackToGo4.all.work.playerDataCase.mysql.error.DatabaseConnectionException;
+import cn.jja8.knapsackToGo4.all.work.playerDataCase.mysql.error.LoadDataError;
 import cn.jja8.knapsackToGo4.all.work.playerDataCase.mysql.error.UpdateLockError;
 
 import java.sql.*;
@@ -17,6 +18,10 @@ public class MysqlDataCase implements PlayerDataCase {
     public final String lockUUID = UUID.randomUUID().toString();
     private Task TaskTimer;
     private Logger logger;
+
+    public Logger getLogger() {
+        return logger;
+    }
 
     public MysqlDataCase(MysqlDataCaseSetUp mysqlDataCaseSetUp, TaskManager taskManager, Logger logger) throws DatabaseConnectionException, SQLException {
         this.mysqlDataCaseSetUp = mysqlDataCaseSetUp;
@@ -69,7 +74,7 @@ public class MysqlDataCase implements PlayerDataCase {
                 }
             }
         } catch (DatabaseConnectionException | SQLException e) {
-            throw new UpdateLockError(logger,e,"更新锁失败，可能造成数据丢失。请尽快关闭服务器！");
+            throw new UpdateLockError(getLogger(),e,"更新锁失败，可能造成数据丢失。请尽快关闭服务器！");
         }
     }
 
@@ -83,7 +88,7 @@ public class MysqlDataCase implements PlayerDataCase {
             del.setString(1,lockUUID);
             del.executeUpdate();
         } catch (DatabaseConnectionException | SQLException e) {
-            throw new UpdateLockError(logger,e, "解锁失败，可能造成数据丢失。");
+            throw new UpdateLockError(getLogger(),e, "解锁失败，可能造成数据丢失。");
         }
     }
 
@@ -128,12 +133,13 @@ public class MysqlDataCase implements PlayerDataCase {
                 update.setString(3,player.getUUID().toString());
                 if (update.executeUpdate()>=1) {
                     return new MysqlDataCaseLock(this,player.getUUID().toString(),lockUUID);//成功拿到锁
+                }else {
+                    return null;//没有拿到锁
                 }
             }
         } catch (DatabaseConnectionException | SQLException e) {
-            e.printStackTrace();
+            throw new LoadDataError(getLogger(),e,"数据库查询出错！");
         }
-        return null;
     }
 
     @Override
@@ -169,10 +175,10 @@ public class MysqlDataCase implements PlayerDataCase {
                     }
                 }
             }
+            return null;
         } catch (DatabaseConnectionException | SQLException e) {
-            e.printStackTrace();
+            throw new LoadDataError(getLogger(),e,"数据库查询出错！");
         }
-        return null;
     }
 
 
