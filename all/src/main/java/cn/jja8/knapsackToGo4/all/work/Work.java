@@ -169,46 +169,47 @@ public class Work {
                     }catch (Exception|Error e){
                         new DataGetLockError(logger,e,"在获得玩家"+ go4Player.getName()+"的锁时发生异常！").printStackTrace();
                     }
-                }
-                try {
-                    byte[] data = lock.loadData();//如果抛出异常则会下次再来
-                    task.cancel();//得到数据后取消任务
+                }else {
+                    try {
+                        byte[] data = lock.loadData();//如果抛出异常则会下次再来
+                        task.cancel();//得到数据后取消任务
 
-                    //异步获得锁和数据之后在主线程加载到玩家上
-                    PlayerDataCaseLock finalLock = lock;
-                    taskManager.runSynchronization(() -> {
-                        try {//防止接口出异常影响正常运行
-                            playerDataSerialize.load(go4Player,data);
-                        }catch (Exception|Error e){
-                            new DataUnSerializeError(logger,e,"玩家"+ go4Player.getName()+"数据反序列化时发生错误。").printStackTrace();
-                        }
-                        //玩家数据加载完成
-                        playerLoadRunMap.remove(go4Player);
-                        playerLockMap.put(go4Player, finalLock);//完成这一条才算真的完成
-                        //加载完成任务
-                        Queue<Runnable> queue = playerLoadFinishedToRunMap.remove(go4Player);
-                        if (queue!=null){
-                            while (true){
-                                Runnable runnable = queue.poll();
-                                if (runnable==null){
-                                    break;
-                                }
-                                try {//防止出异常影响下一条任务运行。
-                                    runnable.run();
-                                }catch (Exception|Error e){
-                                    new LoadFinishedToRunError(logger,e,"玩家数据加载完成任务执行时发生异常！").printStackTrace();
-                                }
-
+                        //异步获得锁和数据之后在主线程加载到玩家上
+                        PlayerDataCaseLock finalLock = lock;
+                        taskManager.runSynchronization(() -> {
+                            try {//防止接口出异常影响正常运行
+                                playerDataSerialize.load(go4Player,data);
+                            }catch (Exception|Error e){
+                                new DataUnSerializeError(logger,e,"玩家"+ go4Player.getName()+"数据反序列化时发生错误。").printStackTrace();
                             }
-                        }
-                        //这个sendMessage在1.18又不是过时的
-                        go4Player.loadingMessage(setUp.lang.loadingFinish);
-                    });
-                }catch (Exception|Error e){
-                    new DataLoadError(logger,e,"玩家"+ go4Player.getName()+"数据加载时发生错误。").printStackTrace();
-                }
+                            //玩家数据加载完成
+                            playerLoadRunMap.remove(go4Player);
+                            playerLockMap.put(go4Player, finalLock);//完成这一条才算真的完成
+                            //加载完成任务
+                            Queue<Runnable> queue = playerLoadFinishedToRunMap.remove(go4Player);
+                            if (queue!=null){
+                                while (true){
+                                    Runnable runnable = queue.poll();
+                                    if (runnable==null){
+                                        break;
+                                    }
+                                    try {//防止出异常影响下一条任务运行。
+                                        runnable.run();
+                                    }catch (Exception|Error e){
+                                        new LoadFinishedToRunError(logger,e,"玩家数据加载完成任务执行时发生异常！").printStackTrace();
+                                    }
 
+                                }
+                            }
+                            //这个sendMessage在1.18又不是过时的
+                            go4Player.loadingMessage(setUp.lang.loadingFinish);
+                        });
+                    }catch (Exception|Error e){
+                        new DataLoadError(logger,e,"玩家"+ go4Player.getName()+"数据加载时发生错误。").printStackTrace();
+                    }
+                }
             }
+
         }
         PlayerJoin playerJoin = new PlayerJoin();
         Task task = taskManager.runCircularTask(setUp.LockDetectionInterval,playerJoin);
