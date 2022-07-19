@@ -8,7 +8,7 @@ public class SetUp {
         /** 加载完成 */
         public  String loadingFinish = "欢迎！";
         /** 正在加载 */
-        public  String isLoading = "正在加载你的数据，请稍等..<数>";
+        public  String isLoading = "等待其他服务器保存数据..<数>";
     }
     /** 语言 */
     public Lang lang = new Lang();
