@@ -55,7 +55,7 @@ public class KnapsackToGo4 extends JavaPlugin{
             return;
         }
 
-        work = new BukkitWork(PlayerData.playerDataCase,PlayerData.playerDataSerialize,new BukkitTaskManager(this),setUp,new BukkitLogger(getLogger()));
+        work = new BukkitWork(PlayerData.playerDataCase,PlayerData.playerDataSerialize,new BukkitTaskManager(this),setUp,BukkitLogger.get());
         Bukkit.getPluginManager().registerEvents(work,this);
 
         getLogger().info("-------------------------------------------------------");

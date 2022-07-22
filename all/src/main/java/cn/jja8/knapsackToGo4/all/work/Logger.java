@@ -5,4 +5,8 @@ public interface Logger {
      * 打印严重的错误信息
      * */
     void severe(String s);
+    /**
+     * 打印信息
+     * */
+    void info(String s);
 }

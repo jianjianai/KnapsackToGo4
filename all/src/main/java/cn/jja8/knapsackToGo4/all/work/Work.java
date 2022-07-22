@@ -29,17 +29,13 @@ public class Work {
         this.taskManager = taskManager;
         this.setUp = setUp;
         this.logger = logger;
-        //自动保存
-        taskManager.runCircularTask(1000 * setUp.AutoSave, () -> {
-            playerLockMap.forEach((go4Player, playerDataCaseLock) -> {
-                taskManager.runSynchronization(() -> {
-                    //主线程获取玩家数据
-                    byte[] data = serialize(go4Player);
-                    //异步存储玩家数据
-                    taskManager.runAsynchronous(() -> save(playerDataCaseLock,data));
-                });
-            });
-        });
+        if (setUp.AutoSave>0){
+            logger.info("自动保存功能启动，时间间隔："+setUp.AutoSave+"秒。");
+            //自动保存
+            taskManager.runCircularTask(1000 * setUp.AutoSave, () -> saveAllPlayerData(null));
+        }else {
+            logger.info("自动保存功能关闭。只会在玩家退出服务器时和服务器关闭时保存玩家数据，如果服务器崩溃会造成数据丢失！");
+        }
     }
 
     /**
@@ -76,6 +72,43 @@ public class Work {
     //玩家加载完成后运行队列
     private Map<Go4Player, Queue<Runnable>> playerLoadFinishedToRunMap = new HashMap<>();
 
+
+
+
+//下面是接口，就是可以用也可以不用
+
+    /**
+     * 保存所有玩家的数据，此方法内部用于自动保存。
+     * 此方法会创建多个异步任务和多个同步任务，方法执行完成后玩家的数据实际还没有开始保存，而是已经把任务创建完成了。
+     * @param ret 用于接收返回参数，可以是null
+     * */
+    public void saveAllPlayerData(SaveAllPlayerDataRet ret){
+        if(ret!=null) try {//防止此方法异常影响保存，实现类参差不齐
+            ret.numberOfAllPlayer(playerLockMap.size());//返回玩家数量
+        }catch (Error|Exception throwable){
+            throwable.printStackTrace();
+        }
+
+        playerLockMap.forEach((go4Player, playerDataCaseLock) -> {
+            taskManager.runSynchronization(() -> {
+                //主线程获取玩家数据
+                byte[] data = serialize(go4Player);
+                //异步存储玩家数据
+                taskManager.runAsynchronous(() -> {
+                    save(playerDataCaseLock,data);
+
+                    if(ret!=null) try {//防止此方法异常影响正常执行，实现类参差不齐
+                        ret.finish(go4Player);//返回保存完成的玩家
+                    }catch (Error|Exception throwable){
+                        throwable.printStackTrace();
+                    }
+                });
+            });
+        });
+    }
+
+
+
     /**
      * 如果玩家没有加载完成，就加载完成后执行。如果已经加载完成就立即执行。如果玩家还没加载完成数据就退出服务器了就不会执行。
      * */
@@ -91,6 +124,19 @@ public class Work {
             queue.add(runnable);
         }
     }
+
+
+//下面是必须在特定时间调用的特定方法
+
+
+    /**
+     * 在玩家执行任何操作时使用此方法判断玩家是否加载完成，如果没有加载完成应该阻止玩家进行任何操作。
+     * 返回玩家是否加载完成。
+     * */
+    public boolean isLoaded(Go4Player go4Player){
+        return playerLockMap.containsKey(go4Player);
+    }
+
 
     /**
      * 关闭是调用此方法
@@ -219,13 +265,18 @@ public class Work {
     }
 
 
-
     /**
-     * 返回玩家是否加载完成，在玩家执行任何操作时使用此方法判断玩家是否加载完成，如果没有加载完成应该阻止玩家进行任何操作。
+     * 用于接收saveAllPlayerDataRet方法的返回值的接口
      * */
-    public boolean isLoaded(Go4Player go4Player){
-        return playerLockMap.containsKey(go4Player);
+    private interface SaveAllPlayerDataRet {
+        /**
+         * 返回所有会保存的玩家数量
+         * 此方法总是在第一个调用
+         * */
+        void numberOfAllPlayer(int i);
+        /**
+         * 当这个玩家数据保存完成时返回保存玩数据的玩家
+         * */
+        void finish(Go4Player player);
     }
-
-
 }

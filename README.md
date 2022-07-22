@@ -87,7 +87,7 @@ KnapsackToGo4SetUp.yml 是插件核心逻辑的配置文件。保持默认就行
 
 playerDataConfig.yml
 ~~~yaml
-AutoSave: 250   #自动保存时间，单位是秒
+AutoSave: 250   #自动保存时间，单位是秒。小于等于0为关闭自动保存
 LockDetectionInterval: 250   #查询锁间隔，单位是毫秒
 lang: #语言
   isLoading: 正在加载你的数据，请稍等..<数>

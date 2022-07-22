@@ -2,16 +2,27 @@ package cn.jja8.knapsackToGo4.bukkit.work;
 
 
 import cn.jja8.knapsackToGo4.all.work.Logger;
+import cn.jja8.knapsackToGo4.bukkit.KnapsackToGo4;
 
 public class BukkitLogger implements Logger {
-    private final java.util.logging.Logger logger;
+    private static final BukkitLogger bukkitLogger = new BukkitLogger();
 
-    public BukkitLogger(java.util.logging.Logger logger) {
-        this.logger = logger;
+    public static BukkitLogger get() {
+        return bukkitLogger;
     }
+
+    /**
+     * 这是一个单例
+     * */
+    private BukkitLogger() {}
 
     @Override
     public void severe(String s) {
-        logger.severe(s);
+        KnapsackToGo4.knapsackToGo4.getLogger().severe(s);
+    }
+
+    @Override
+    public void info(String s) {
+        KnapsackToGo4.knapsackToGo4.getLogger().info(s);
     }
 }
