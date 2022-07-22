@@ -55,7 +55,7 @@ public class Work {
                 }
 
 
-                Map<Go4Player,Integer> errmap = new HashMap<>();//记录玩家数据保存错误
+                final Map<Go4Player,Integer> errmap = new HashMap<>();//记录玩家数据保存错误
                 @Override
                 public void error(Go4Player player, Throwable throwable) {
                     Integer errtime = errmap.get(player);
@@ -270,7 +270,7 @@ public class Work {
          * 返回所有会保存的玩家数量
          * 此方法总是在第一个调用
          * */
-        default void numberOfAllPlayer(int i){};
+        default void numberOfAllPlayer(int i){}
         /**
          * 当这个玩家数据保存完成时返回保存玩数据的玩家
          * */
@@ -298,18 +298,16 @@ public class Work {
             throwable.printStackTrace();
         }
         SavePlayerDataRet finalRet = ret;
-        playerDataCaseLockMap.forEach((go4Player, playerLock) -> {
-            savePlayerData(go4Player,playerLock, new UpdatePlayerDataRet() {
-                @Override
-                public void finish(Go4Player player,PlayerLock playerLock) {
-                    finalRet.finish(player);
-                }
-                @Override
-                public void error(Go4Player player,PlayerLock playerLock, Throwable throwable) {
-                    finalRet.error(player,throwable);
-                }
-            });
-        });
+        playerDataCaseLockMap.forEach((go4Player, playerLock) -> savePlayerData(go4Player,playerLock, new UpdatePlayerDataRet() {
+            @Override
+            public void finish(Go4Player player,PlayerLock playerLock) {
+                finalRet.finish(player);
+            }
+            @Override
+            public void error(Go4Player player,PlayerLock playerLock, Throwable throwable) {
+                finalRet.error(player,throwable);
+            }
+        }));
     }
 
     /**
@@ -342,10 +340,6 @@ public class Work {
         });
     }
 
-    /**
-     * 加载玩家数据，此方法内部用于玩家进入时加载
-     * */
-
 
 
     /**
@@ -362,7 +356,7 @@ public class Work {
          * 返回所有会保存的玩家数量
          * 此方法总是在第一个调用
          * */
-        default void numberOfAllPlayer(int i){};
+        default void numberOfAllPlayer(int i){}
         /**
          * 当这个玩家数据保存完成时返回保存玩数据的玩家
          * */
