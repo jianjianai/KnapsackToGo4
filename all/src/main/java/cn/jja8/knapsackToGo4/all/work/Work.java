@@ -498,7 +498,7 @@ public class Work {
         if (playerStatus==null){
             return false;
         }
-        return playerStatus.Loaded;
+        return playerStatus.Loaded&&(!playerStatus.playerQuit);//玩家加载完成，并且没有退出
     }
 
 
