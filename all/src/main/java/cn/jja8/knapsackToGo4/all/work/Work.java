@@ -104,7 +104,7 @@ public class Work {
          * 解锁,会柱塞，可在异步调用
          * 只要异常就代表没有解锁成功
          * */
-        public void unlock() throws DataUnlockException{
+        public synchronized void unlock() throws DataUnlockException{
             try {
                 playerDataCaseLock.unlock();
                 playerDataCaseLockMap.remove(go4Player);
@@ -389,6 +389,8 @@ public class Work {
         Task task = null;
         long time = 0;
         boolean Loaded = false;//玩家已经加载完成
+        boolean playerQuit = false; //表示玩家已经退出
+        boolean loading = false;//表示正在加载
         public PlayerStatus(Go4Player go4Player) {
             this.go4Player = go4Player;
         }
@@ -397,64 +399,87 @@ public class Work {
             task = taskManager.runCircularTask(setUp.LockDetectionInterval, () -> {
                 go4Player.loadingMessage(setUp.lang.isLoading.replaceAll("<数>", String.valueOf(time)));
                 time++;
-                synchronized (PlayerStatus.this){
+
                     playerLock =  lock(go4Player);
                     if (playerLock!=null){
                         task.cancel();
+                    }else {
+                        return;
                     }
-                    loadPlayerData(go4Player, playerLock, new UpdatePlayerDataRet() {
-                        @Override
-                        public void finish(Go4Player player, PlayerLock playerLock) {
-                            Loaded = true;
-                            go4Player.loadingMessage(setUp.lang.loadingFinish);
-                        }
+                    synchronized (PlayerStatus.this){
+                        loading =true;
+                        if (playerQuit){
+                            unlock();
+                        }else {
+                            loadPlayerData(go4Player, playerLock, new UpdatePlayerDataRet() {
+                                @Override
+                                public void finish(Go4Player player, PlayerLock playerLock) {
+                                    Loaded = true;
+                                    go4Player.loadingMessage(setUp.lang.loadingFinish);
+                                }
 
-                        @Override
-                        public void error(Go4Player player, PlayerLock playerLock, Throwable throwable) {
-                            go4Player.loadingMessage(setUp.lang.isLoadingError.replaceAll("<数>", String.valueOf(time)));
-                            time++;
-                            logger.severe("进入时加载:玩家"+player+"的数据加载失败，将在1秒后自动重试！下方是详细错误原因。");
-                            throwable.printStackTrace();
-                            taskManager.runAsynchronous(() -> loadPlayerData(player,playerLock,this),1000);
+                                @Override
+                                public void error(Go4Player player, PlayerLock playerLock, Throwable throwable) {
+                                    go4Player.loadingMessage(setUp.lang.isLoadingError.replaceAll("<数>", String.valueOf(time)));
+                                    time++;
+                                    logger.severe("进入时加载:玩家"+player+"的数据加载失败，将在1秒后自动重试！下方是详细错误原因。");
+                                    throwable.printStackTrace();
+                                    taskManager.runAsynchronous(() -> loadPlayerData(player,playerLock,this),1000);
+                                }
+                            });
                         }
-                    });
-                }
+                    }
             });
         }
 
         private void playerQuit(){
-            if (task!=null){
-                task.cancel();
-            }
-            synchronized (PlayerStatus.this){
-                if (playerLock!=null){
-                    savePlayerData(go4Player,playerLock, new UpdatePlayerDataRet() {
-                        @Override
-                        public void finish(Go4Player player,PlayerLock playerLock) {
-                            taskManager.runAsynchronous(() -> {
-                                if (playerLock!=null){
-                                    for (int i = 0; i < 10; i++) {
-                                        try {
-                                            playerLock.unlock();
-                                            return;
-                                        } catch (Exception | Error e) {
-                                            new DataSaveError(logger, e, "在为"+ go4Player.getName()+"解锁时发生异常！"+(i==0?"":"重试第"+i+"次")).printStackTrace();
-                                            try {Thread.sleep(1000);} catch (InterruptedException ignored) {}
-                                        }
-                                    }
-                                    throw new DataSaveError(logger, "在为"+ go4Player.getName()+"解锁时发生异常！重试10次全部失败。");
-                                }
-                            });
+            taskManager.runAsynchronous(new Runnable() {
+                @Override
+                public void run() {
+                    if (task!=null){
+                        task.cancel();
+                    }
+                    synchronized (PlayerStatus.this){
+                        playerQuit = true;
+                        if (!loading){
+                            return;
                         }
-                        @Override
-                        public void error(Go4Player player,PlayerLock playerLock, Throwable throwable) {
-                            logger.severe("退出时保存:玩家"+player+"的数据保存失败，将在1秒后自动重试！下方是详细错误原因。");
-                            throwable.printStackTrace();
-                            taskManager.runAsynchronous(() -> savePlayerData(player,playerLock,this),1000);
+                        if (!Loaded){//等待加载完成了保存
+                            taskManager.runAsynchronous(this,50);
+                            return;
                         }
-                    });
+                        savePlayerData(go4Player,playerLock, new UpdatePlayerDataRet() {
+                            @Override
+                            public void finish(Go4Player player,PlayerLock playerLock) {
+                                unlock();
+                            }
+                            @Override
+                            public void error(Go4Player player,PlayerLock playerLock, Throwable throwable) {
+                                logger.severe("退出时保存:玩家"+player+"的数据保存失败，将在1秒后自动重试！下方是详细错误原因。");
+                                throwable.printStackTrace();
+                                taskManager.runAsynchronous(() -> savePlayerData(player,playerLock,this),1000);
+                            }
+                        });
+                    }
                 }
-            }
+            });
+        }
+
+        private void unlock(){
+            taskManager.runAsynchronous(() -> {
+                if (playerLock!=null){
+                    for (int i = 0; i < 10; i++) {
+                        try {
+                            playerLock.unlock();
+                            return;
+                        } catch (Exception | Error e) {
+                            new DataSaveError(logger, e, "在为"+ go4Player.getName()+"解锁时发生异常！"+(i==0?"":"重试第"+i+"次")).printStackTrace();
+                            try {Thread.sleep(1000);} catch (InterruptedException ignored) {}
+                        }
+                    }
+                    throw new DataSaveError(logger, "在为"+ go4Player.getName()+"解锁时发生异常！重试10次全部失败。");
+                }
+            });
         }
 
     }
