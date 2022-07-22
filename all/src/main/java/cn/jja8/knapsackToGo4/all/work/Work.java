@@ -2,8 +2,8 @@ package cn.jja8.knapsackToGo4.all.work;
 
 import cn.jja8.knapsackToGo4.all.work.error.*;
 
-import java.util.*;
-import java.util.function.BiConsumer;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 同步的工作主要逻辑。
@@ -222,6 +222,7 @@ public class Work {
         });
     }
 
+
     /**
      * 加载某个玩家的数据，此方法内部用于玩家进入时加载
      * 此方法会创建多个异步任务和多个同步任务，方法执行完成后玩家的数据实际还没有开始加载，而是已经把任务创建完成了。
@@ -293,7 +294,7 @@ public class Work {
             ret = SavePlayerDataRet.NULL;
         }
         try {
-            ret.numberOfAllPlayer(playerStatusMap.size());
+            ret.numberOfAllPlayer(playerDataCaseLockMap.size());
         }catch (Throwable throwable){
             throwable.printStackTrace();
         }
@@ -500,7 +501,20 @@ public class Work {
      * 关闭是调用此方法
      * */
     public void close() {
-        playerStatusMap.forEach((go4Player, playerStatus) -> playerStatus.playerQuit());
+        new HashMap<>(playerDataCaseLockMap).forEach((go4Player, playerLock) -> {
+            for (int i = 0; i < 10; i++) {
+                try {
+                    byte[] data = serialize(go4Player);
+                    playerLock.update(data);
+                    playerLock.unlock();
+                    return;
+                } catch (Exception | Error e) {
+                    new DataSaveError(logger, e, "在为"+ go4Player.getName()+"保存数据并解锁时发生异常！"+(i==0?"":"重试第"+i+"次")).printStackTrace();
+                    try {Thread.sleep(1000);} catch (InterruptedException ignored) {}
+                }
+            }
+        });
+        playerDataCase.close();
     }
 
     /**
