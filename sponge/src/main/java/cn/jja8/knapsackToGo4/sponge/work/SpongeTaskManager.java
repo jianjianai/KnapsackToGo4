@@ -23,6 +23,16 @@ public class SpongeTaskManager implements TaskManager {
     }
 
     @Override
+    public void runSynchronization(Runnable runnable, long time) {
+        Sponge.asyncScheduler().executor(KnapsackToGo4.pluginContainer).schedule(runnable,time,TimeUnit.MILLISECONDS);
+    }
+
+    @Override
+    public void runAsynchronous(Runnable runnable, long time) {
+        Sponge.server().scheduler().executor(KnapsackToGo4.pluginContainer).schedule(runnable,time,TimeUnit.MILLISECONDS);
+    }
+
+    @Override
     public Task runCircularTask(long time, Runnable runnable) {
         ScheduledTaskFuture<?> scheduledTaskFuture = Sponge.asyncScheduler().executor(KnapsackToGo4.pluginContainer).scheduleAtFixedRate(runnable,time,time, TimeUnit.MILLISECONDS);
         return new SpongeTask(scheduledTaskFuture);

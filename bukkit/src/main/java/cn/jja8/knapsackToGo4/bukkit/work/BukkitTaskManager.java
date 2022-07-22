@@ -22,6 +22,18 @@ public class BukkitTaskManager implements TaskManager {
     }
 
     @Override
+    public void runSynchronization(Runnable runnable, long time) {
+        long task = time/50;
+        Bukkit.getScheduler().runTaskLater(plugin,runnable,task);
+    }
+
+    @Override
+    public void runAsynchronous(Runnable runnable, long time) {
+        long task = time/50;
+        Bukkit.getScheduler().runTaskLaterAsynchronously(plugin,runnable,task);
+    }
+
+    @Override
     public Task runCircularTask(long time, Runnable runnable) {
         long task = time/50;
         if (task<1){

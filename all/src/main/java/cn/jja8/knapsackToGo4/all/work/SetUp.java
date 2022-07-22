@@ -9,6 +9,7 @@ public class SetUp {
         public  String loadingFinish = "欢迎！";
         /** 正在加载 */
         public  String isLoading = "等待其他服务器保存数据..<数>";
+        public String isLoadingError = "读取数据时发生错误，请联系管理员..<数>";
     }
     /** 语言 */
     public Lang lang = new Lang();

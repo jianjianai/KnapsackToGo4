@@ -6,17 +6,17 @@ public interface PlayerDataCaseLock {
      *
      * 如果调用此方法的的实现抛出异常会自动重试
      * */
-    void saveData(byte[] bytes) ;
+    void saveData(byte[] bytes) throws Throwable;
     /**
      * 从公共的数据库中加载某玩家的数据
      *
      * 如果调用此方法的的实现抛出异常会自动重试
      * */
-    byte[] loadData();
+    byte[] loadData() throws Throwable;
     /**
      * 解锁，并且释放资源
      *
      * 如果调用此方法的的实现抛出异常会自动重试
      * */
-    void unlock();
+    void unlock() throws Throwable;
 }
