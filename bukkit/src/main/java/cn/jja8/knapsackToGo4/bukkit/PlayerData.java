@@ -10,7 +10,7 @@ import cn.jja8.knapsackToGo4.bukkit.error.ConfigLoadException;
 import cn.jja8.knapsackToGo4.bukkit.error.DataCaseLoadError;
 import cn.jja8.knapsackToGo4.bukkit.error.DataCloseError;
 import cn.jja8.knapsackToGo4.bukkit.error.NoOptionsError;
-import cn.jja8.patronSaint_2022_3_2_1244.allUsed.file.YamlConfig;
+import cn.jja8.patronSaint.all.V2.file.YamlConfig;
 
 import java.io.File;
 import java.io.IOException;

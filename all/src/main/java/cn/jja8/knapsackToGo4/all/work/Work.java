@@ -104,12 +104,14 @@ public class Work {
          * 解锁,会柱塞，可在异步调用
          * 只要异常就代表没有解锁成功
          * */
-        public synchronized void unlock() throws DataUnlockException{
-            try {
-                playerDataCaseLock.unlock();
-                playerDataCaseLockMap.remove(go4Player);
-            } catch (Throwable e) {
-                throw new DataUnlockException(logger,"解锁数据错误！");
+        public void unlock() throws DataUnlockException{
+            synchronized(this){
+                try {
+                    playerDataCaseLock.unlock();
+                    playerDataCaseLockMap.remove(go4Player);
+                } catch (Throwable e) {
+                    throw new DataUnlockException(logger,"解锁数据错误！");
+                }
             }
         }
 
@@ -118,22 +120,25 @@ public class Work {
          * 更新玩家数据,会柱塞，可在异步调用
          * */
         private synchronized void update(byte[] data) throws DataUpdateException {
-            try {
-                playerDataCaseLock.saveData(data);
-            }catch (Throwable e){
-                throw new DataUpdateException(logger,e,"数据更新错误！");
+            synchronized(this){
+                try {
+                    playerDataCaseLock.saveData(data);
+                }catch (Throwable e){
+                    throw new DataUpdateException(logger,e,"数据更新错误！");
+                }
             }
-
         }
 
         /**
          * 查询玩家数据,会柱塞，可在异步调用
          * */
         private synchronized byte[] select() throws DataSelectException{
-            try {
-                return playerDataCaseLock.loadData();
-            } catch (Throwable e) {
-                throw new DataSelectException(logger,e,"数据查询错误！");
+            synchronized(this){
+                try {
+                    return playerDataCaseLock.loadData();
+                } catch (Throwable e) {
+                    throw new DataSelectException(logger,e,"数据查询错误！");
+                }
             }
         }
     }
@@ -164,7 +169,7 @@ public class Work {
      * 尝试获得锁,会柱塞，可在异步调用
      * null代表没有获取到锁
      * */
-    private PlayerLock lock(Go4Player go4Player){
+    private PlayerLock lock(Go4Player go4Player) throws DataLockException {
         PlayerLock playerLock = playerDataCaseLockMap.get(go4Player);
         if (playerLock!=null){
             return playerLock;
@@ -176,8 +181,7 @@ public class Work {
             }
             return new PlayerLock(go4Player,playerDataCaseLock);
         } catch (Throwable e) {
-            new DataLockException(logger,"获取玩家"+go4Player.getName()+"的锁时发生异常！").printStackTrace();
-            return null;
+            throw  new DataLockException(logger,"获取玩家"+go4Player.getName()+"的锁时发生异常！");
         }
     }
 
@@ -192,9 +196,6 @@ public class Work {
         if (ret==null){
             ret=UpdatePlayerDataRet.NULL;
         }
-
-        try {ret.numberOfAllPlayer(1);}catch (Error|Exception throwable){throwable.printStackTrace();}//传保存数量
-
         UpdatePlayerDataRet finalRet = ret;
         taskManager.runSynchronization(() -> {//同步序列化
             try {
@@ -268,11 +269,6 @@ public class Work {
             public void error(Go4Player player, PlayerLock playerLock, Throwable throwable) {throwable.printStackTrace();}
         };
         /**
-         * 返回所有会保存的玩家数量
-         * 此方法总是在第一个调用
-         * */
-        default void numberOfAllPlayer(int i){}
-        /**
          * 当这个玩家数据保存完成时返回保存玩数据的玩家
          * */
         void finish(Go4Player player,PlayerLock playerLock);
@@ -327,9 +323,59 @@ public class Work {
         SavePlayerDataRet finalRet = ret;
         savePlayerData(go4Player, playerLock, new UpdatePlayerDataRet() {
             @Override
-            public void numberOfAllPlayer(int i) {
-                finalRet.numberOfAllPlayer(i);
+            public void finish(Go4Player player, PlayerLock playerLock) {
+                finalRet.finish(player);
             }
+            @Override
+            public void error(Go4Player player, PlayerLock playerLock, Throwable throwable) {
+                finalRet.error(player,throwable);
+            }
+        });
+    }
+
+    /**
+     * 加载所有玩家的数据
+     * 此方法会创建多个异步任务和多个同步任务，方法执行完成后玩家的数据实际还没有开始加载，而是已经把任务创建完成了。
+     * @param ret 用于接收返回参数，可以是null
+     * */
+    public void loadAllPlayerData(SavePlayerDataRet ret){
+        if (ret==null){
+            ret = SavePlayerDataRet.NULL;
+        }
+        try {
+            ret.numberOfAllPlayer(playerDataCaseLockMap.size());
+        }catch (Throwable throwable){
+            throwable.printStackTrace();
+        }
+        SavePlayerDataRet finalRet = ret;
+        playerDataCaseLockMap.forEach((go4Player, playerLock) -> loadPlayerData(go4Player, playerLock, new UpdatePlayerDataRet() {
+            @Override
+            public void finish(Go4Player player, PlayerLock playerLock) {
+                finalRet.finish(player);
+            }
+            @Override
+            public void error(Go4Player player, PlayerLock playerLock, Throwable throwable) {
+                finalRet.error(player,throwable);
+            }
+        }));
+    }
+
+
+    /**
+     * 从数据库加载某个玩家的数据，此方法内部用于玩家进入时加载
+     * 此方法会创建多个异步任务和多个同步任务，方法执行完成后玩家的数据实际还没有开始加载，而是已经把任务创建完成了。
+     * @param ret 用于接收返回参数，可以是null
+     * */
+    public void loadPlayerData(Go4Player go4Player, SavePlayerDataRet ret) throws NoPlayerLockException {
+        PlayerLock playerLock = playerDataCaseLockMap.get(go4Player);
+        if (playerLock==null){
+            throw new NoPlayerLockException(logger,go4Player.getName()+"玩家没有锁，无法保存数据！");
+        }
+        if (ret==null){
+            ret = SavePlayerDataRet.NULL;
+        }
+        SavePlayerDataRet finalRet = ret;
+        loadPlayerData(go4Player, playerLock, new UpdatePlayerDataRet() {
             @Override
             public void finish(Go4Player player, PlayerLock playerLock) {
                 finalRet.finish(player);
@@ -340,6 +386,8 @@ public class Work {
             }
         });
     }
+
+
 
 
 
@@ -355,7 +403,7 @@ public class Work {
         };
         /**
          * 返回所有会保存的玩家数量
-         * 此方法总是在第一个调用
+         * 此方法在保存或加载多名玩家时才会调用
          * */
         default void numberOfAllPlayer(int i){}
         /**
@@ -392,9 +440,10 @@ public class Work {
 
         private void playerJoin(){
             task = taskManager.runCircularTask(setUp.LockDetectionInterval, () -> {
-                go4Player.loadingMessage(setUp.lang.isLoading.replaceAll("<数>", String.valueOf(time)));
+                go4Player.loadingMessage(setUp.lang.waiting.replaceAll("<数>", String.valueOf(time)));
                 time++;
 
+                try {
                     playerLock =  lock(go4Player);
                     if (playerLock!=null){
                         task.cancel();
@@ -406,6 +455,7 @@ public class Work {
                         if (playerQuit){
                             unlock();
                         }else {
+                            go4Player.loadingMessage(setUp.lang.isLoading.replaceAll("<数>", String.valueOf(time)));
                             loadPlayerData(go4Player, playerLock, new UpdatePlayerDataRet() {
                                 @Override
                                 public void finish(Go4Player player, PlayerLock playerLock) {
@@ -417,13 +467,19 @@ public class Work {
                                 public void error(Go4Player player, PlayerLock playerLock, Throwable throwable) {
                                     go4Player.loadingMessage(setUp.lang.isLoadingError.replaceAll("<数>", String.valueOf(time)));
                                     time++;
-                                    logger.severe("进入时加载:玩家"+player+"的数据加载失败，将在1秒后自动重试！下方是详细错误原因。");
+                                    logger.severe("进入时加载:玩家"+player.getName()+"的数据加载失败，将在1秒后自动重试！下方是详细错误原因。");
                                     throwable.printStackTrace();
                                     taskManager.runAsynchronous(() -> loadPlayerData(player,playerLock,this),1000);
                                 }
                             });
                         }
                     }
+                }catch (DataLockException e){
+                    go4Player.loadingMessage(setUp.lang.isLoadingError.replaceAll("<数>", String.valueOf(time)));
+                    time++;
+                    logger.severe("进入时加载:玩家"+go4Player.getName()+"获取锁时发生错误。下方是详细错误原因。");
+                    e.printStackTrace();
+                }
             });
         }
 

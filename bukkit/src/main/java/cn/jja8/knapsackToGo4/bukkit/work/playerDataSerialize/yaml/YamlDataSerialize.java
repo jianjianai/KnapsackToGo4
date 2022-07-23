@@ -9,7 +9,7 @@ import cn.jja8.knapsackToGo4.bukkit.work.playerDataSerialize.yaml.error.NoBukkit
 import cn.jja8.knapsackToGo4.bukkit.work.playerDataSerialize.yaml.error.PatrLoadError;
 import cn.jja8.knapsackToGo4.bukkit.work.playerDataSerialize.yaml.error.PatrSaveError;
 import cn.jja8.knapsackToGo4.bukkit.work.playerDataSerialize.yaml.part.*;
-import cn.jja8.patronSaint_2022_3_2_1244.allUsed.file.YamlConfig;
+import cn.jja8.patronSaint.all.V2.file.YamlConfig;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;

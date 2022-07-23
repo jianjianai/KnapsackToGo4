@@ -11,7 +11,7 @@ import cn.jja8.knapsackToGo4.bukkit.KnapsackToGo4;
 import cn.jja8.knapsackToGo4.bukkit.error.DataCaseLoadError;
 import cn.jja8.knapsackToGo4.bukkit.work.BukkitLogger;
 import cn.jja8.knapsackToGo4.bukkit.work.BukkitTaskManager;
-import cn.jja8.patronSaint_2022_3_2_1244.allUsed.file.YamlConfig;
+import cn.jja8.patronSaint.all.V2.file.YamlConfig;
 
 import java.io.File;
 

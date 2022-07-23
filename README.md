@@ -90,8 +90,10 @@ playerDataConfig.yml
 AutoSave: 250   #自动保存时间，单位是秒。小于等于0为关闭自动保存
 LockDetectionInterval: 250   #查询锁间隔，单位是毫秒
 lang: #语言
-  isLoading: 正在加载你的数据，请稍等..<数>
+  isLoading: 正在加载你的数据,请稍等..<数>
+  isLoadingError: 服务器开小差了，请联系管理员叫醒他哦..<数>
   loadingFinish: 欢迎！
+  waiting: 等待其他服务器保存数据..<数>
 ~~~
 
 ### 其他配置文件

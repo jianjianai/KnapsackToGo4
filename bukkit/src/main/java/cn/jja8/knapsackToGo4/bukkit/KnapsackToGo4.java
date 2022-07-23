@@ -1,13 +1,14 @@
 package cn.jja8.knapsackToGo4.bukkit;
 
 import cn.jja8.knapsackToGo4.all.work.SetUp;
+import cn.jja8.knapsackToGo4.bukkit.command.CommandManager;
 import cn.jja8.knapsackToGo4.bukkit.error.ConfigLoadError;
 import cn.jja8.knapsackToGo4.bukkit.work.BukkitGo4Player;
 import cn.jja8.knapsackToGo4.bukkit.work.BukkitLogger;
 import cn.jja8.knapsackToGo4.bukkit.work.BukkitTaskManager;
 import cn.jja8.knapsackToGo4.bukkit.work.BukkitWork;
-import cn.jja8.patronSaint_2022_3_2_1244.allUsed.file.YamlConfig;
-import cn.jja8.patronSaint_2022_3_2_1244.bukkit.bStats.Metrics;
+import cn.jja8.patronSaint.all.V2.file.YamlConfig;
+import cn.jja8.patronSaint.bukkit.v2.bStats.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -17,7 +18,7 @@ import java.io.IOException;
 
 public class KnapsackToGo4 extends JavaPlugin{
     public static KnapsackToGo4 knapsackToGo4;
-    BukkitWork work;
+    public BukkitWork work;
 
     @Override
     public void onEnable() {
@@ -68,6 +69,9 @@ public class KnapsackToGo4 extends JavaPlugin{
         for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
             work.playerJoin(new BukkitGo4Player(onlinePlayer));
         }
+
+
+        CommandManager.load();
 
         new Metrics(this, 15256);
     }
