@@ -4,7 +4,6 @@ import cn.jja8.knapsackToGo4.all.work.error.*;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.BiConsumer;
 
 /**
  * 同步的工作主要逻辑。
@@ -89,16 +88,10 @@ public class Work {
 
 //内部方法和对象--------------------------------------------------------------------------------------------------------------------
 
-    //玩家和锁
-    private final Map<Go4Player,PlayerLock> playerDataCaseLockMap = new HashMap<>();
-
     public class PlayerLock{
-        private final Go4Player go4Player;
         private final PlayerDataCaseLock playerDataCaseLock;
-        public PlayerLock(Go4Player go4Player, PlayerDataCaseLock playerDataCaseLock) {
-            this.go4Player = go4Player;
+        public PlayerLock(PlayerDataCaseLock playerDataCaseLock) {
             this.playerDataCaseLock = playerDataCaseLock;
-            playerDataCaseLockMap.put(go4Player,this);
         }
 
         /**
@@ -106,13 +99,10 @@ public class Work {
          * 只要异常就代表没有解锁成功
          * */
         public void unlock() throws DataUnlockException{
-            synchronized(playerDataCaseLockMap){
-                try {
-                    playerDataCaseLock.unlock();
-                    playerDataCaseLockMap.remove(go4Player);
-                } catch (Throwable e) {
-                    throw new DataUnlockException(logger,e,"解锁数据错误！");
-                }
+            try {
+                playerDataCaseLock.unlock();
+            } catch (Throwable e) {
+                throw new DataUnlockException(logger,e,"解锁数据错误！");
             }
         }
 
@@ -167,18 +157,12 @@ public class Work {
      * null代表没有获取到锁
      * */
     private PlayerLock lock(Go4Player go4Player) throws DataLockException {
-        PlayerLock playerLock = playerDataCaseLockMap.get(go4Player);
-        if (playerLock!=null){
-            return playerLock;
-        }
         try {
-            synchronized (playerDataCaseLockMap){
-                PlayerDataCaseLock playerDataCaseLock = playerDataCase.getPlayerDataLock(go4Player);
-                if (playerDataCaseLock==null){
-                    return null;
-                }
-                return new PlayerLock(go4Player,playerDataCaseLock);
+            PlayerDataCaseLock playerDataCaseLock = playerDataCase.getPlayerDataLock(go4Player);
+            if (playerDataCaseLock==null){
+                return null;
             }
+            return new PlayerLock(playerDataCaseLock);
         } catch (Throwable e) {
             throw  new DataLockException(logger,e,"获取玩家"+go4Player.getName()+"的锁时发生异常！");
         }
@@ -318,15 +302,18 @@ public class Work {
      * @param ret 用于接收返回参数，可以是null
      * */
     public void savePlayerData(Go4Player go4Player, SavePlayerDataRet ret) throws NoPlayerLockException {
-        PlayerLock playerLock = playerDataCaseLockMap.get(go4Player);
-        if (playerLock==null){
+        PlayerStatus playerStatus;
+        synchronized (playerStatusMap){
+            playerStatus = playerStatusMap.remove(go4Player);
+        }
+        if (playerStatus==null||playerStatus.playerLock==null){
             throw new NoPlayerLockException(logger,go4Player.getName()+"玩家没有锁，无法保存数据！");
         }
         if (ret==null){
             ret = SavePlayerDataRet.NULL;
         }
         SavePlayerDataRet finalRet = ret;
-        savePlayerData(go4Player, playerLock, new UpdatePlayerDataRet() {
+        savePlayerData(go4Player, playerStatus.playerLock, new UpdatePlayerDataRet() {
             @Override
             public void finish(Go4Player player, PlayerLock playerLock) {
                 finalRet.finish(player);
@@ -378,15 +365,18 @@ public class Work {
      * @param ret 用于接收返回参数，可以是null
      * */
     public void loadPlayerData(Go4Player go4Player, SavePlayerDataRet ret) throws NoPlayerLockException {
-        PlayerLock playerLock = playerDataCaseLockMap.get(go4Player);
-        if (playerLock==null){
+        PlayerStatus playerStatus;
+        synchronized (playerStatusMap){
+            playerStatus = playerStatusMap.remove(go4Player);
+        }
+        if (playerStatus==null||playerStatus.playerLock==null){
             throw new NoPlayerLockException(logger,go4Player.getName()+"玩家没有锁，无法保存数据！");
         }
         if (ret==null){
             ret = SavePlayerDataRet.NULL;
         }
         SavePlayerDataRet finalRet = ret;
-        loadPlayerData(go4Player, playerLock, new UpdatePlayerDataRet() {
+        loadPlayerData(go4Player, playerStatus.playerLock, new UpdatePlayerDataRet() {
             @Override
             public void finish(Go4Player player, PlayerLock playerLock) {
                 finalRet.finish(player);
@@ -396,6 +386,20 @@ public class Work {
                 finalRet.error(player,throwable);
             }
         });
+    }
+
+    /**
+     * 解除玩家的错误，也就是取消反序列化直接进入服务器。
+     * */
+    public void cancelError(Go4Player go4Player) throws NoPlayerLockException {
+        PlayerStatus playerStatus;
+        synchronized (playerStatusMap){
+            playerStatus = playerStatusMap.remove(go4Player);
+        }
+        if (playerStatus==null||playerStatus.playerLock==null){
+            throw new NoPlayerLockException(logger,go4Player.getName()+"玩家没有锁，无法取消错误！");
+        }
+        playerStatus.dataError = false;
     }
 
     /**
@@ -541,18 +545,16 @@ public class Work {
 
         private void unlock(){
             taskManager.runAsynchronous(() -> {
-                if (playerLock!=null){
-                    for (int i = 0; i < 10; i++) {
-                        try {
-                            playerLock.unlock();
-                            return;
-                        } catch (Exception | Error e) {
-                            new DataSaveError(logger, e, "在为"+ go4Player.getName()+"解锁时发生异常！"+(i==0?"":"重试第"+i+"次")).printStackTrace();
-                            try {Thread.sleep(1000);} catch (InterruptedException ignored) {}
-                        }
+                for (int i = 0; i < 10; i++) {
+                    try {
+                        playerLock.unlock();
+                        return;
+                    } catch (Exception | Error e) {
+                        new DataSaveError(logger, e, "在为"+ go4Player.getName()+"解锁时发生异常！"+(i==0?"":"重试第"+i+"次")).printStackTrace();
+                        try {Thread.sleep(1000);} catch (InterruptedException ignored) {}
                     }
-                    throw new DataSaveError(logger, "在为"+ go4Player.getName()+"解锁时发生异常！重试10次全部失败。");
                 }
+                throw new DataSaveError(logger, "在为"+ go4Player.getName()+"解锁时发生异常！重试10次全部失败。");
             });
         }
 
@@ -585,17 +587,19 @@ public class Work {
      * */
     public void close() {
         new HashMap<>(playerStatusMap).forEach((go4Player, playerStatus) -> {
-            if (isLoaded(playerStatus)){
-                for (int i = 0; i < 10; i++) {
-                    try {
+            for (int i = 0; i < 10; i++) {
+                try {
+                    if (isLoaded(playerStatus)){
                         byte[] data = serialize(go4Player);
                         playerStatus.playerLock.update(data);
                         playerStatus.playerLock.unlock();
                         return;
-                    } catch (Exception | Error e) {
-                        new DataSaveError(logger, e, "在为"+ go4Player.getName()+"保存数据并解锁时发生异常！"+(i==0?"":"重试第"+i+"次")).printStackTrace();
-                        try {Thread.sleep(1000);} catch (InterruptedException ignored) {}
+                    }else if (playerStatus.playerLock!=null) {
+                        playerStatus.playerLock.unlock();
                     }
+                } catch (Exception | Error e) {
+                    new DataSaveError(logger, e, "在为"+ go4Player.getName()+"保存数据并解锁时发生异常！"+(i==0?"":"重试第"+i+"次")).printStackTrace();
+                    try {Thread.sleep(1000);} catch (InterruptedException ignored) {}
                 }
             }
         });
@@ -606,7 +610,10 @@ public class Work {
      * 在玩家推出时调用此方法，使他开始工作
      * */
     public void playerQuit(Go4Player go4Player){//玩家离开服务器
-        PlayerStatus playerStatus = playerStatusMap.remove(go4Player);
+        PlayerStatus playerStatus;
+        synchronized (playerStatusMap){
+            playerStatus = playerStatusMap.remove(go4Player);
+        }
         if (playerStatus!=null){
             playerStatus.playerQuit();
         }
@@ -615,10 +622,13 @@ public class Work {
      * 在玩家加入时调用此方法，使他开始工作
      * */
     public void playerJoin(Go4Player go4Player){//玩家进入服务器
-        PlayerStatus playerStatus =  playerStatusMap.get(go4Player);
-        if (playerStatus==null){
-            playerStatus = new PlayerStatus(go4Player);
-            playerStatusMap.put(go4Player,playerStatus);
+        PlayerStatus playerStatus;
+        synchronized (playerStatusMap){
+            playerStatus =  playerStatusMap.get(go4Player);
+            if (playerStatus==null){
+                playerStatus = new PlayerStatus(go4Player);
+                playerStatusMap.put(go4Player,playerStatus);
+            }
         }
         playerStatus.playerJoin();
     }

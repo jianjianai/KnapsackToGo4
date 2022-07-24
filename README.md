@@ -48,7 +48,20 @@ ps：
  - 解决了服务器崩溃死锁的问题
 
 
+## 命令
+/knapsackToGo4 <操作>
+#### SaveAllPlayerData
+保存全部玩家数据
+#### SavePlayerData
+保存某玩家数据，此命令是不安全的。如果玩家数据没有加载完成就执行了此命令会导致当前服务器的旧数据覆盖掉玩家的数据。
+#### LoadAllPlayerData
+加载全部玩家的数据，此命令是不安全的。会从新从数据库加载玩家的数据，未保存的数据会全部被覆盖。
+#### LoadPlayerData
+加载某个玩家的数据
+#### CancelError
+解除某个玩家的数据错误。使用此命令代表放弃数据库中的数据，使用本服务器中的旧数据。
 
+如果玩家的数据发生错误，默认的提示是“数据似乎出错了,请联系管理员恢复数据..<数>”就是KnapsackToGo4SetUp.yml中的isDataError
 
 # 使用方法
 
@@ -90,8 +103,9 @@ playerDataConfig.yml
 AutoSave: 250   #自动保存时间，单位是秒。小于等于0为关闭自动保存
 LockDetectionInterval: 250   #查询锁间隔，单位是毫秒
 lang: #语言
+  isDataError: 数据似乎出错了,请联系管理员恢复数据..<数>  #玩家的数据反序列化时出错
   isLoading: 正在加载你的数据,请稍等..<数>
-  isLoadingError: 服务器开小差了，请联系管理员叫醒他哦..<数>
+  isLoadingError: 服务器开小差了，请联系管理员叫醒他哦..<数>  #一般是数据库连接出错
   loadingFinish: 欢迎！
   waiting: 等待其他服务器保存数据..<数>
 ~~~

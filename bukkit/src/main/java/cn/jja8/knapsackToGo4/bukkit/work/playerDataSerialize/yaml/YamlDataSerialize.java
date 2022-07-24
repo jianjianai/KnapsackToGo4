@@ -11,6 +11,7 @@ import cn.jja8.knapsackToGo4.bukkit.work.playerDataSerialize.yaml.error.PatrSave
 import cn.jja8.knapsackToGo4.bukkit.work.playerDataSerialize.yaml.part.*;
 import cn.jja8.patronSaint.all.V2.file.YamlConfig;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 
@@ -69,7 +70,7 @@ public class YamlDataSerialize implements PlayerDataSerialize {
     }
 
     @Override
-    public void load(Go4Player go4Player, byte[] bytes) {
+    public void load(Go4Player go4Player, byte[] bytes) throws IOException, InvalidConfigurationException {
         if (!(go4Player instanceof BukkitGo4Player)){
             throw new NoBukkitGo4PlayerError("无法加载玩家"+go4Player.getName()+"的数据，因为他不是一个BukkitGo4Player！而是"+go4Player.getClass().getName());
         }
@@ -79,7 +80,8 @@ public class YamlDataSerialize implements PlayerDataSerialize {
         }
         String ymlString = new String(bytes,StandardCharsets.UTF_8);
         StringReader stringReader = new StringReader(ymlString);
-        YamlConfiguration yamlConfiguration = YamlConfiguration.loadConfiguration(stringReader);
+        YamlConfiguration yamlConfiguration = new YamlConfiguration();
+        yamlConfiguration.load(stringReader);
         for (YamlDataSerializePart yamlDataSerializePart : yamlDataSerializePartSet) {
             String key = null;
             try {
