@@ -394,12 +394,15 @@ public class Work {
     public void cancelError(Go4Player go4Player) throws NoPlayerLockException {
         PlayerStatus playerStatus;
         synchronized (playerStatusMap){
-            playerStatus = playerStatusMap.remove(go4Player);
+            playerStatus = playerStatusMap.get(go4Player);
         }
         if (playerStatus==null||playerStatus.playerLock==null){
             throw new NoPlayerLockException(logger,go4Player.getName()+"玩家没有锁，无法取消错误！");
         }
-        playerStatus.dataError = false;
+        if (playerStatus.dataError){
+            playerStatus.dataError = false;
+            playerStatus.task.cancel();
+        }
     }
 
     /**
@@ -472,7 +475,7 @@ public class Work {
 
                                     @Override
                                     public void error(Go4Player player, PlayerLock playerLock, Throwable throwable) {
-                                        if (throwable instanceof DataSerializeException){
+                                        if (throwable instanceof DataDeserializeException){
                                             //如果是数据序列化出错，就设置为错误。退出时不保存数据防止无法恢复。
                                             dataError = true;
                                             Loaded = true;

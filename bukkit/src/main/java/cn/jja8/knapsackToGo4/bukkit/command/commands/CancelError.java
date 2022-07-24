@@ -21,7 +21,7 @@ public class CancelError implements CommandImplement , CanSetUp {
     @Lang
     public String PlayerError = "<player>玩家取消错误错误";
     @Lang
-    public String PlayerFinish = "<player>玩家数据加载完成";
+    public String PlayerFinish = "<player>玩家数据错误解除完成";
 
     @Override
     public boolean command(CommandSender commandSender, String[] args) {
