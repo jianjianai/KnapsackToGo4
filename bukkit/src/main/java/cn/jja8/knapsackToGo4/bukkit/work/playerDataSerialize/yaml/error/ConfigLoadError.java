@@ -4,10 +4,6 @@ import cn.jja8.knapsackToGo4.bukkit.error.BukkitKnapsackToGo4Error;
 
 public class ConfigLoadError extends BukkitKnapsackToGo4Error {
 
-    public ConfigLoadError(String message) {
-        super(message);
-    }
-
     public ConfigLoadError(Throwable cause, String message) {
         super(cause, message);
     }

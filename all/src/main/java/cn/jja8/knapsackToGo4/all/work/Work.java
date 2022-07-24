@@ -4,6 +4,7 @@ import cn.jja8.knapsackToGo4.all.work.error.*;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.BiConsumer;
 
 /**
  * 同步的工作主要逻辑。
@@ -105,12 +106,12 @@ public class Work {
          * 只要异常就代表没有解锁成功
          * */
         public void unlock() throws DataUnlockException{
-            synchronized(this){
+            synchronized(playerDataCaseLockMap){
                 try {
                     playerDataCaseLock.unlock();
                     playerDataCaseLockMap.remove(go4Player);
                 } catch (Throwable e) {
-                    throw new DataUnlockException(logger,"解锁数据错误！");
+                    throw new DataUnlockException(logger,e,"解锁数据错误！");
                 }
             }
         }
@@ -119,26 +120,22 @@ public class Work {
         /**
          * 更新玩家数据,会柱塞，可在异步调用
          * */
-        private synchronized void update(byte[] data) throws DataUpdateException {
-            synchronized(this){
-                try {
-                    playerDataCaseLock.saveData(data);
-                }catch (Throwable e){
-                    throw new DataUpdateException(logger,e,"数据更新错误！");
-                }
+        private void update(byte[] data) throws DataUpdateException {
+            try {
+                playerDataCaseLock.saveData(data);
+            }catch (Throwable e){
+                throw new DataUpdateException(logger,e,"数据更新错误！");
             }
         }
 
         /**
          * 查询玩家数据,会柱塞，可在异步调用
          * */
-        private synchronized byte[] select() throws DataSelectException{
-            synchronized(this){
-                try {
-                    return playerDataCaseLock.loadData();
-                } catch (Throwable e) {
-                    throw new DataSelectException(logger,e,"数据查询错误！");
-                }
+        private byte[] select() throws DataSelectException{
+            try {
+                return playerDataCaseLock.loadData();
+            } catch (Throwable e) {
+                throw new DataSelectException(logger,e,"数据查询错误！");
             }
         }
     }
@@ -175,13 +172,15 @@ public class Work {
             return playerLock;
         }
         try {
-            PlayerDataCaseLock playerDataCaseLock = playerDataCase.getPlayerDataLock(go4Player);
-            if (playerDataCaseLock==null){
-                return null;
+            synchronized (playerDataCaseLockMap){
+                PlayerDataCaseLock playerDataCaseLock = playerDataCase.getPlayerDataLock(go4Player);
+                if (playerDataCaseLock==null){
+                    return null;
+                }
+                return new PlayerLock(go4Player,playerDataCaseLock);
             }
-            return new PlayerLock(go4Player,playerDataCaseLock);
         } catch (Throwable e) {
-            throw  new DataLockException(logger,"获取玩家"+go4Player.getName()+"的锁时发生异常！");
+            throw  new DataLockException(logger,e,"获取玩家"+go4Player.getName()+"的锁时发生异常！");
         }
     }
 
@@ -290,19 +289,25 @@ public class Work {
             ret = SavePlayerDataRet.NULL;
         }
         try {
-            ret.numberOfAllPlayer(playerDataCaseLockMap.size());
+            ret.numberOfAllPlayer(playerStatusMap.size());
         }catch (Throwable throwable){
             throwable.printStackTrace();
         }
         SavePlayerDataRet finalRet = ret;
-        playerDataCaseLockMap.forEach((go4Player, playerLock) -> savePlayerData(go4Player,playerLock, new UpdatePlayerDataRet() {
-            @Override
-            public void finish(Go4Player player,PlayerLock playerLock) {
-                finalRet.finish(player);
-            }
-            @Override
-            public void error(Go4Player player,PlayerLock playerLock, Throwable throwable) {
-                finalRet.error(player,throwable);
+        playerStatusMap.forEach(((go4Player, playerStatus) -> {
+            if (isLoaded(playerStatus)){
+                savePlayerData(go4Player,playerStatus.playerLock, new UpdatePlayerDataRet() {
+                    @Override
+                    public void finish(Go4Player player,PlayerLock playerLock) {
+                        finalRet.finish(player);
+                    }
+                    @Override
+                    public void error(Go4Player player,PlayerLock playerLock, Throwable throwable) {
+                        finalRet.error(player,throwable);
+                    }
+                });
+            }else {
+                finalRet.finish(go4Player);
             }
         }));
     }
@@ -343,21 +348,27 @@ public class Work {
             ret = SavePlayerDataRet.NULL;
         }
         try {
-            ret.numberOfAllPlayer(playerDataCaseLockMap.size());
+            ret.numberOfAllPlayer(playerStatusMap.size());
         }catch (Throwable throwable){
             throwable.printStackTrace();
         }
         SavePlayerDataRet finalRet = ret;
-        playerDataCaseLockMap.forEach((go4Player, playerLock) -> loadPlayerData(go4Player, playerLock, new UpdatePlayerDataRet() {
-            @Override
-            public void finish(Go4Player player, PlayerLock playerLock) {
-                finalRet.finish(player);
+        playerStatusMap.forEach((go4Player, playerStatus) -> {
+            if (isLoaded(playerStatus)){
+                loadPlayerData(go4Player, playerStatus.playerLock, new UpdatePlayerDataRet() {
+                    @Override
+                    public void finish(Go4Player player, PlayerLock playerLock) {
+                        finalRet.finish(player);
+                    }
+                    @Override
+                    public void error(Go4Player player, PlayerLock playerLock, Throwable throwable) {
+                        finalRet.error(player,throwable);
+                    }
+                });
+            }else {
+                finalRet.finish(go4Player);
             }
-            @Override
-            public void error(Go4Player player, PlayerLock playerLock, Throwable throwable) {
-                finalRet.error(player,throwable);
-            }
-        }));
+        });
     }
 
 
@@ -386,10 +397,6 @@ public class Work {
             }
         });
     }
-
-
-
-
 
     /**
      * 用于接收保存玩家数据方法的返回值的接口
@@ -434,49 +441,61 @@ public class Work {
         boolean Loaded = false;//玩家已经加载完成
         boolean playerQuit = false; //表示玩家已经退出
         boolean loading = false;//表示正在加载
+        boolean dataError = false;//表示玩家的数据有错误
         public PlayerStatus(Go4Player go4Player) {
             this.go4Player = go4Player;
         }
 
         private void playerJoin(){
+            go4Player.loadingMessage(setUp.lang.waiting.replaceAll("<数>", String.valueOf(time)));
             task = taskManager.runCircularTask(setUp.LockDetectionInterval, () -> {
-                go4Player.loadingMessage(setUp.lang.waiting.replaceAll("<数>", String.valueOf(time)));
                 time++;
-
                 try {
-                    playerLock =  lock(go4Player);
                     if (playerLock!=null){
-                        task.cancel();
-                    }else {
-                        return;
-                    }
-                    synchronized (PlayerStatus.this){
-                        loading =true;
-                        if (playerQuit){
-                            unlock();
-                        }else {
-                            go4Player.loadingMessage(setUp.lang.isLoading.replaceAll("<数>", String.valueOf(time)));
-                            loadPlayerData(go4Player, playerLock, new UpdatePlayerDataRet() {
-                                @Override
-                                public void finish(Go4Player player, PlayerLock playerLock) {
-                                    Loaded = true;
-                                    go4Player.loadingMessage(setUp.lang.loadingFinish);
-                                }
+                        task.cancel();//取消循环任务
+                        go4Player.loadingMessage(setUp.lang.isLoading.replaceAll("<数>", String.valueOf(time)));
+                        synchronized (PlayerStatus.this){
+                            loading =true;
+                            if (playerQuit){
+                                unlock();
+                            }else {
+                                loadPlayerData(go4Player, playerLock, new UpdatePlayerDataRet() {
+                                    @Override
+                                    public void finish(Go4Player player, PlayerLock playerLock) {
+                                        Loaded = true;
+                                        go4Player.loadingMessage(setUp.lang.loadingFinish);
+                                    }
 
-                                @Override
-                                public void error(Go4Player player, PlayerLock playerLock, Throwable throwable) {
-                                    go4Player.loadingMessage(setUp.lang.isLoadingError.replaceAll("<数>", String.valueOf(time)));
-                                    time++;
-                                    logger.severe("进入时加载:玩家"+player.getName()+"的数据加载失败，将在1秒后自动重试！下方是详细错误原因。");
-                                    throwable.printStackTrace();
-                                    taskManager.runAsynchronous(() -> loadPlayerData(player,playerLock,this),1000);
-                                }
-                            });
+                                    @Override
+                                    public void error(Go4Player player, PlayerLock playerLock, Throwable throwable) {
+                                        if (throwable instanceof DataSerializeException){
+                                            //如果是数据序列化出错，就设置为错误。退出时不保存数据防止无法恢复。
+                                            dataError = true;
+                                            Loaded = true;
+                                            throwable.printStackTrace();
+                                            logger.severe("进入时加载:玩家"+player.getName()+"的数据出错，已经取消加载。");
+                                            go4Player.loadingMessage(setUp.lang.isDataError.replaceAll("<数>", String.valueOf(time)));
+                                            task = taskManager.runCircularTask(setUp.LockDetectionInterval, () -> {
+                                                time++;
+                                                go4Player.loadingMessage(setUp.lang.isDataError.replaceAll("<数>", String.valueOf(time)));
+                                            });
+                                        }else {
+                                            go4Player.loadingMessage(setUp.lang.isLoadingError.replaceAll("<数>", String.valueOf(time)));
+                                            time++;
+                                            logger.severe("进入时加载:玩家"+player.getName()+"的数据加载失败，将在1秒后自动重试！下方是详细错误原因。");
+                                            throwable.printStackTrace();
+                                            taskManager.runAsynchronous(() -> loadPlayerData(player,playerLock,this),1000);
+                                        }
+                                    }
+                                });
+                            }
                         }
+                    }else {
+                        playerLock =  lock(go4Player);
+                        go4Player.loadingMessage(setUp.lang.waiting.replaceAll("<数>", String.valueOf(time)));
                     }
                 }catch (DataLockException e){
                     go4Player.loadingMessage(setUp.lang.isLoadingError.replaceAll("<数>", String.valueOf(time)));
-                    time++;
                     logger.severe("进入时加载:玩家"+go4Player.getName()+"获取锁时发生错误。下方是详细错误原因。");
                     e.printStackTrace();
                 }
@@ -499,18 +518,22 @@ public class Work {
                             taskManager.runAsynchronous(this,50);
                             return;
                         }
-                        savePlayerData(go4Player,playerLock, new UpdatePlayerDataRet() {
-                            @Override
-                            public void finish(Go4Player player,PlayerLock playerLock) {
-                                unlock();
-                            }
-                            @Override
-                            public void error(Go4Player player,PlayerLock playerLock, Throwable throwable) {
-                                logger.severe("退出时保存:玩家"+player+"的数据保存失败，将在1秒后自动重试！下方是详细错误原因。");
-                                throwable.printStackTrace();
-                                taskManager.runAsynchronous(() -> savePlayerData(player,playerLock,this),1000);
-                            }
-                        });
+                        if (dataError){
+                            unlock();
+                        }else {
+                            savePlayerData(go4Player,playerLock, new UpdatePlayerDataRet() {
+                                @Override
+                                public void finish(Go4Player player,PlayerLock playerLock) {
+                                    unlock();
+                                }
+                                @Override
+                                public void error(Go4Player player,PlayerLock playerLock, Throwable throwable) {
+                                    logger.severe("退出时保存:玩家"+player+"的数据保存失败，将在1秒后自动重试！下方是详细错误原因。");
+                                    throwable.printStackTrace();
+                                    taskManager.runAsynchronous(() -> savePlayerData(player,playerLock,this),1000);
+                                }
+                            });
+                        }
                     }
                 }
             });
@@ -549,7 +572,11 @@ public class Work {
         if (playerStatus==null){
             return false;
         }
-        return playerStatus.Loaded&&(!playerStatus.playerQuit);//玩家加载完成，并且没有退出
+        return isLoaded(playerStatus);
+    }
+
+    public boolean isLoaded(PlayerStatus playerStatus){
+        return playerStatus.Loaded&&(!playerStatus.playerQuit)&&(!playerStatus.dataError);//玩家加载完成，并且没有退出,并且没出错
     }
 
 
@@ -557,16 +584,18 @@ public class Work {
      * 关闭是调用此方法
      * */
     public void close() {
-        new HashMap<>(playerDataCaseLockMap).forEach((go4Player, playerLock) -> {
-            for (int i = 0; i < 10; i++) {
-                try {
-                    byte[] data = serialize(go4Player);
-                    playerLock.update(data);
-                    playerLock.unlock();
-                    return;
-                } catch (Exception | Error e) {
-                    new DataSaveError(logger, e, "在为"+ go4Player.getName()+"保存数据并解锁时发生异常！"+(i==0?"":"重试第"+i+"次")).printStackTrace();
-                    try {Thread.sleep(1000);} catch (InterruptedException ignored) {}
+        new HashMap<>(playerStatusMap).forEach((go4Player, playerStatus) -> {
+            if (isLoaded(playerStatus)){
+                for (int i = 0; i < 10; i++) {
+                    try {
+                        byte[] data = serialize(go4Player);
+                        playerStatus.playerLock.update(data);
+                        playerStatus.playerLock.unlock();
+                        return;
+                    } catch (Exception | Error e) {
+                        new DataSaveError(logger, e, "在为"+ go4Player.getName()+"保存数据并解锁时发生异常！"+(i==0?"":"重试第"+i+"次")).printStackTrace();
+                        try {Thread.sleep(1000);} catch (InterruptedException ignored) {}
+                    }
                 }
             }
         });

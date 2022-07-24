@@ -9,10 +9,6 @@ import cn.jja8.knapsackToGo4.all.work.error.KnapsackToGo4Error;
 public class LoadDataError extends KnapsackToGo4Error {
 
 
-    public LoadDataError(Logger logger, String message) {
-        super(logger, message);
-    }
-
     public LoadDataError(Logger logger, Throwable cause, String message) {
         super(logger, cause, message);
     }

@@ -9,10 +9,6 @@ import cn.jja8.knapsackToGo4.all.work.Logger;
  * */
 public class DatabaseConnectionException extends KnapsackToGo4Exception {
 
-    public DatabaseConnectionException(Logger logger, String message) {
-        super(logger, message);
-    }
-
     public DatabaseConnectionException(Logger logger, Throwable cause, String message) {
         super(logger, cause, message);
     }

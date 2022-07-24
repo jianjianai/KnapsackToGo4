@@ -38,8 +38,10 @@ public class KnapsackToGo4 extends JavaPlugin{
             getLogger().severe("当前服务端版本："+v);
             getLogger().severe("-------------------------------------------------------");
             getLogger().severe("若有疑问，您可以前往 “PlugClub/插件实验室 - 820131534” 交流。");
+            getLogger().severe("为了保证数据安全，将在30秒后关闭服务器。");
+            try {Thread.sleep(30000);} catch (InterruptedException ignored) {}
+            Bukkit.shutdown();
             return;
-
         }
 
         SetUp setUp;
@@ -53,6 +55,9 @@ public class KnapsackToGo4 extends JavaPlugin{
             getLogger().severe("当前服务端版本："+v);
             getLogger().severe("-------------------------------------------------------");
             getLogger().severe("若有疑问，您可以前往 “PlugClub/插件实验室 - 820131534” 交流。");
+            getLogger().severe("为了保证数据安全，将在30秒后关闭服务器。");
+            try {Thread.sleep(30000);} catch (InterruptedException ignored) {}
+            Bukkit.shutdown();
             return;
         }
 
@@ -78,6 +83,8 @@ public class KnapsackToGo4 extends JavaPlugin{
 
     @Override
     public void onDisable() {
-        work.close();
+        if (work!=null){
+            work.close();
+        }
     }
 }

@@ -10,7 +10,9 @@ public class SetUp {
         /** 正在加载 */
         public String isLoading = "正在加载你的数据,请稍等..<数>";
         public String waiting = "等待其他服务器保存数据..<数>";
+        /** 错误 */
         public String isLoadingError = "服务器开小差了，请联系管理员叫醒他哦..<数>";
+        public String isDataError = "数据似乎出错了,请联系管理员恢复数据..<数>";
     }
     /** 语言 */
     public Lang lang = new Lang();
