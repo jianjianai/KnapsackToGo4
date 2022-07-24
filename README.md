@@ -221,6 +221,8 @@ PotionEffects: true #药水效果
 
 
 # 建议与反馈
+常见问题解答：[常见问题解答](https://gitee.com/jja8/KnapsackToGo4/blob/master/%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98%E8%A7%A3%E7%AD%94.md)
+
 issues：[Issues · 简简爱/KnapsackToGo4](https://gitee.com/jja8/KnapsackToGo4/issues)
 
 插件实验室：[PlugClub / 插件实验室](https://jq.qq.com/?_wv=1027&k=LyeQlfSK) （群号:820131534）
