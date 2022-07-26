@@ -86,21 +86,21 @@ ps：
 ## 注意
 请认真读完注意事项，避免发生数据丢失。
 
-PlayerDataSettings.yml请在开服之前配置好后就不要再修改，否则会丢失数据。
+PlayerDataCase.yml和PlayerDataSerialize.yml请在开服之前配置好后就不要再修改，否则会丢失数据。
 
-配置项playerDataCaseType是数据容器，也就是存储数据的方式。一旦设置好后就不要修改了。
+PlayerDataCase.yml是数据容器，也就是存储数据的方式。一旦设置好后就不要修改了。
 
-配置项playerDataSerializeType是数据序列化，是表示数据的方式。一旦设置好后就不要修改了。
+PlayerDataSerialize.yml是数据序列化，是表示数据的方式。一旦设置好后就不要修改了。
 
-如果使用了数据容器类扩展，playerDataCaseType将无效。插件在识别到扩展的情况下不会读取playerDataCaseType。
+如果使用了数据容器类扩展PlayerDataCase.yml将无效。插件在识别到扩展的情况下不会生成PlayerDataCase.yml文件，说明安装成功。例如安装了MongoDB数据库的扩展，请删除PlayerDataCase.yml配置文件。
 
-如果使用了数据序列化类扩展，playerDataSerializeType将无效。插件在识别到扩展的情况下不会读取playerDataSerializeType。
+如果使用了数据序列化类扩展PlayerDataSerialize.yml文件将无效。插件在识别到扩展的情况下不会生成PlayerDataSerialize.yml文件，说明安装成功。例如安装了NBT序列化的扩展，请删除PlayerDataSerialize.yml配置文件。
 
-如果需要你的服务器已经有许多的玩家数据了，请不要安装或者删除任何扩展。因为很有可能造成数据丢失。
+如果需要你的服务器已经有许多的玩家数据了，请不要安装或者删除如何扩展。因为很有可能造成数据丢失。
 
-请尽量在插件第一次加载时就将所有扩展安装好，插件在识别到数据容器类扩展的情况下不会读取playerDataCaseType配置项，在识别到数据序列化扩展的情况下不会读取playerDataSerializeType配置项。
+请尽量在插件第一次加载时就将所以扩展安装好，插件在识别到数据容器类扩展的情况下不会生成PlayerDataCase.yml文件，在识别到数据序列化扩展的情况下不会生成PlayerDataSerialize.yml文件。
 
-如果在开发环境，需要修改playerDataSerializeType或者安装或删除序列化类扩展，请先清除数据容器中的全部数据。使用的文件就删除文件，使用的数据库就删除表。
+如果在开发环境，需要修改PlayerDataSerialize.yml或者安装或删除序列化类扩展，请先清除数据容器中的全部数据。使用的文件就删除文件，使用的数据库就删除表。
 
 ## 关于配置文件
 
@@ -121,28 +121,33 @@ lang: #语言
 ~~~
 
 ### 其他配置文件
-- PlayerDataSettings.yml 数据容器和序列化方法的配置文件
+- PlayerDataCase.yml 选择序列数据容器的配置文件
+- PlayerDataSerialize.yml  选择数据序列化方法的配置文件
 
 为什么不是核心配置文件？
 
-playerDataCaseType中的是告诉插件要注册什么数据容器，其实容器类扩展的功能就是注册自己的数据容器，所以在有扩展的时候不会读取playerDataCaseType。
+PlayerDataCase.yml是告诉插件要注册什么数据容器，其实容器类扩展的功能就是注册自己的数据容器，所以在有扩展的时候不会生成PlayerDataCase.yml配置文件。
 
-playerDataSerializeType是告诉插件要注册什么序列化方法，其实序列化扩展就是注册自己的序列化方法，所以在有扩展的时候就不会读取playerDataSerializeType。
+PlayerDataSerialize.yml是告诉插件要注册什么序列化方法，其实序列化扩展就是注册自己的序列化方法，所以在有扩展的时候就不会生成PlayerDataSerialize.yml配置文件。
 
 目前插件有三种数据容器，一种序列化方法。
 
 
-PlayerDataSettings.yml
+PlayerDataCase.yml
 ~~~yaml
 playerDataCaseType: Mysql  #填下方容器列表的其中一种就行了
+~~~
+
+PlayerDataSerialize.yml
+~~~yaml
 playerDataSerializeType: Yaml  #填下方序列化方法列表的其中一种就行了
 ~~~
 
-为什么需要这个文件？
+为什么需要这两个文件？
 
-因为插件里自带了多种数据容器和序列化方法，所以需要这个文件来告诉插件你要用哪一个。
+因为插件里自带了多种数据容器和序列化方法，所以需要这两个文件来告诉插件你要用哪一个。
 
-为什么安装相应的扩展就不需对应的配置项了？
+为什么安装相应的扩展就不需对应的文件了？
 
 因为安装扩展就相当于已经选择扩展作为数据容器或序列化方法了，所以自然不需要了。
 

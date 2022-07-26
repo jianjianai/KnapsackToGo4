@@ -1,6 +1,5 @@
 package cn.jja8.knapsackToGo4.bukkit.config.playerData;
 
-public class PlayerDataSettings {
-    public String playerDataCaseType = "File";
+public class PlayerDataSerialize {
     public String playerDataSerializeType = "Yaml";
 }
