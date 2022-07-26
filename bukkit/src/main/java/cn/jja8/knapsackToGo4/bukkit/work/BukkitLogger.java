@@ -18,11 +18,11 @@ public class BukkitLogger implements Logger {
 
     @Override
     public void severe(String s) {
-        KnapsackToGo4.knapsackToGo4.getLogger().severe(s);
+        KnapsackToGo4.INSTANCE.getLogger().severe(s);
     }
 
     @Override
     public void info(String s) {
-        KnapsackToGo4.knapsackToGo4.getLogger().info(s);
+        KnapsackToGo4.INSTANCE.getLogger().info(s);
     }
 }

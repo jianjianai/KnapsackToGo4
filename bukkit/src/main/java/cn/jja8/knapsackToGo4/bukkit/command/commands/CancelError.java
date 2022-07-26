@@ -35,7 +35,7 @@ public class CancelError implements CommandImplement , CanSetUp {
             return true;
         }
         try {
-            KnapsackToGo4.knapsackToGo4.work.cancelError(new BukkitGo4Player(player));
+            KnapsackToGo4.INSTANCE.work.cancelError(new BukkitGo4Player(player));
             commandSender.sendMessage(PlayerFinish.replaceAll("<player>",args[0]));
         } catch (NoPlayerLockException e) {
             e.printStackTrace();

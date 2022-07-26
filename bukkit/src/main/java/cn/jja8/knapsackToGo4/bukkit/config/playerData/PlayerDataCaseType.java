@@ -27,19 +27,19 @@ public enum PlayerDataCaseType {
                 default:return null;
                 case File:
                     return new FileDataCase(
-                            YamlConfig.loadFromFile(new File(KnapsackToGo4.knapsackToGo4.getDataFolder(),"FileDataCaseSetUp.yml"), new FileDataCaseSetUp()),
+                            YamlConfig.loadFromFile(new File(KnapsackToGo4.INSTANCE.getDataFolder(),"FileDataCaseSetUp.yml"), new FileDataCaseSetUp()),
                             BukkitLogger.get()
                     );
                 case Sqlite:
                     return new SqliteDataCase(
-                            YamlConfig.loadFromFile(new File(KnapsackToGo4.knapsackToGo4.getDataFolder(),"SqliteDataCaseSetUp.yml"), new SqliteDataCaseSetUp()),
-                            new BukkitTaskManager(KnapsackToGo4.knapsackToGo4),
+                            YamlConfig.loadFromFile(new File(KnapsackToGo4.INSTANCE.getDataFolder(),"SqliteDataCaseSetUp.yml"), new SqliteDataCaseSetUp()),
+                            new BukkitTaskManager(KnapsackToGo4.INSTANCE),
                             BukkitLogger.get()
                     );
                 case Mysql:
                     return new MysqlDataCase(
-                            YamlConfig.loadFromFile(new File(KnapsackToGo4.knapsackToGo4.getDataFolder(),"MysqlDataCaseSetUp.yml"), new MysqlDataCaseSetUp()),
-                            new BukkitTaskManager(KnapsackToGo4.knapsackToGo4),
+                            YamlConfig.loadFromFile(new File(KnapsackToGo4.INSTANCE.getDataFolder(),"MysqlDataCaseSetUp.yml"), new MysqlDataCaseSetUp()),
+                            new BukkitTaskManager(KnapsackToGo4.INSTANCE),
                             BukkitLogger.get()
                     );
             }

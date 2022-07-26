@@ -37,7 +37,7 @@ public class SavePlayerData implements CommandImplement , CanSetUp {
             return true;
         }
         try {
-            KnapsackToGo4.knapsackToGo4.work.savePlayerData(new BukkitGo4Player(player), new Work.SavePlayerDataRet() {
+            KnapsackToGo4.INSTANCE.work.savePlayerData(new BukkitGo4Player(player), new Work.SavePlayerDataRet() {
                 @Override
                 public void finish(Go4Player player) {
                     commandSender.sendMessage(PlayerFinish.replaceAll("<player>",args[0]));

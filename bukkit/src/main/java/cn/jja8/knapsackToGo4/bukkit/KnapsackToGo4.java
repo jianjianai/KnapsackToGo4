@@ -17,12 +17,12 @@ import java.io.File;
 import java.io.IOException;
 
 public class KnapsackToGo4 extends JavaPlugin{
-    public static KnapsackToGo4 knapsackToGo4;
+    public static KnapsackToGo4 INSTANCE;
     public BukkitWork work;
 
     @Override
     public void onEnable() {
-        knapsackToGo4 = this;
+        INSTANCE = this;
         String v = "unknown";
         try {
             v = Bukkit.getServer().getClass().getName().split("\\.")[3];
