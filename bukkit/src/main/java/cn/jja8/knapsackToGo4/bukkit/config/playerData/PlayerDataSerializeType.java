@@ -8,9 +8,9 @@ public enum PlayerDataSerializeType {
 
 
     public PlayerDataSerialize getYamlDataSerialize() {
-        switch (this){
-            default:return null;
-            case Yaml:return YamlDataSerialize.get();
+        if (this == PlayerDataSerializeType.Yaml) {
+            return YamlDataSerialize.get();
         }
+        return null;
     }
 }
