@@ -38,7 +38,7 @@ public class YamlDataSerialize implements PlayerDataSerialize {
 
     public final Set<YamlDataSerializePart> yamlDataSerializePartSet = new HashSet<>();
     private YamlDataSerialize() throws IOException {
-        YamlDataSerializeSetUp c = YamlConfig.loadFromFile(new File(KnapsackToGo4.knapsackToGo4.getDataFolder(),"YamlDataSerializeSetUp.yml"),new YamlDataSerializeSetUp());
+        YamlDataSerializeSetUp c = YamlConfig.loadFromFile(new File(KnapsackToGo4.INSTANCE.getDataFolder(),"YamlDataSerializeSetUp.yml"),new YamlDataSerializeSetUp());
         if (c.AdvancementProgress) yamlDataSerializePartSet.add(new AdvancementProgress());
         if (c.EnderChest) yamlDataSerializePartSet.add(new EnderChest());
         if (c.Experience) yamlDataSerializePartSet.add(new Experience());

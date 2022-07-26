@@ -12,7 +12,7 @@ import java.util.List;
 
 public class CommandManager {
     public static void load(){
-        File configFiles = new File(KnapsackToGo4.knapsackToGo4.getDataFolder(),"Command");
+        File configFiles = new File(KnapsackToGo4.INSTANCE.getDataFolder(),"Command");
         List<String> aliases = new ArrayList<>();
         aliases.add("ktg4");
         aliases.add("go4");
@@ -25,7 +25,7 @@ public class CommandManager {
                         .addCommand(new Command("LoadAllPlayerData").setPower("knapsackToGo4.admin.LoadAllPlayerData").setCommandImplement(new LoadAllPlayerData()))
                         .addCommand(new Command("LoadPlayerData").setPower("knapsackToGo4.admin.LoadPlayerData").setCommandImplement(new LoadPlayerData()))
                         .addCommand(new Command("CancelError").setPower("knapsackToGo4.admin.CancelError").setCommandImplement(new CancelError()))
-        ).load(new File(configFiles,"knapsackToGo4.yaml")).run(KnapsackToGo4.knapsackToGo4);
+        ).load(new File(configFiles,"knapsackToGo4.yaml")).run(KnapsackToGo4.INSTANCE);
 
     }
 }

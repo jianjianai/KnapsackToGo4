@@ -21,7 +21,7 @@ public class LoadAllPlayerData implements CommandImplement, CanSetUp {
 
     @Override
     public boolean command(CommandSender commandSender, String[] args) {
-        KnapsackToGo4.knapsackToGo4.work.loadAllPlayerData(new Work.SavePlayerDataRet() {
+        KnapsackToGo4.INSTANCE.work.loadAllPlayerData(new Work.SavePlayerDataRet() {
             @Override
             public void numberOfAllPlayer(int i) {
                 commandSender.sendMessage(StartLoading.replaceAll("<i>", String.valueOf(i)));
@@ -35,9 +35,9 @@ public class LoadAllPlayerData implements CommandImplement, CanSetUp {
             @Override
             public void error(Go4Player player, Throwable throwable) {
                 commandSender.sendMessage(Error.replaceAll("<player>",player.getName()));
-                Bukkit.getScheduler().runTaskLaterAsynchronously(KnapsackToGo4.knapsackToGo4, () -> {
+                Bukkit.getScheduler().runTaskLaterAsynchronously(KnapsackToGo4.INSTANCE, () -> {
                     try {
-                        KnapsackToGo4.knapsackToGo4.work.loadPlayerData(player,this);
+                        KnapsackToGo4.INSTANCE.work.loadPlayerData(player,this);
                     } catch (NoPlayerLockException e) {
                         e.printStackTrace();
                     }

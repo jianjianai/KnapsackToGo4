@@ -37,7 +37,7 @@ public class LoadPlayerData implements CommandImplement , CanSetUp {
             return true;
         }
         try {
-            KnapsackToGo4.knapsackToGo4.work.loadPlayerData(new BukkitGo4Player(player), new Work.SavePlayerDataRet() {
+            KnapsackToGo4.INSTANCE.work.loadPlayerData(new BukkitGo4Player(player), new Work.SavePlayerDataRet() {
                 @Override
                 public void finish(Go4Player player) {
                     commandSender.sendMessage(PlayerFinish.replaceAll("<player>",args[0]));

@@ -27,7 +27,7 @@ public class PlayerData {
         if (playerDataCase==null){
             String playerDataCase = null;
             try {
-                playerDataCase = YamlConfig.loadFromFile(new File(KnapsackToGo4.knapsackToGo4.getDataFolder(),"PlayerDataCase.yml"),new PlayerDataCaseString()).playerDataCaseType;
+                playerDataCase = YamlConfig.loadFromFile(new File(KnapsackToGo4.INSTANCE.getDataFolder(),"PlayerDataCase.yml"),new PlayerDataCaseString()).playerDataCaseType;
                 PlayerDataCaseType playerDataCaseType = PlayerDataCaseType.valueOf(playerDataCase);
                 PlayerData.playerDataCase = playerDataCaseType.getDataCase();
             } catch (IOException e) {
@@ -36,12 +36,12 @@ public class PlayerData {
                 throw new NoOptionsError(e,"加载配置文件PlayerDataCase.yml中"+playerDataCase+"值不存在！");
             }
         }else {
-            KnapsackToGo4.knapsackToGo4.getLogger().info("已加载数据容器扩展。["+playerDataCase.getClass().getName()+"]");
+            KnapsackToGo4.INSTANCE.getLogger().info("已加载数据容器扩展。["+playerDataCase.getClass().getName()+"]");
         }
         if (playerDataSerialize==null){
             String playerDataSerialize = null;
             try {
-                playerDataSerialize = YamlConfig.loadFromFile(new File(KnapsackToGo4.knapsackToGo4.getDataFolder(),"PlayerDataSerialize.yml"),new cn.jja8.knapsackToGo4.bukkit.config.playerData.PlayerDataSerialize()).playerDataSerializeType;
+                playerDataSerialize = YamlConfig.loadFromFile(new File(KnapsackToGo4.INSTANCE.getDataFolder(),"PlayerDataSerialize.yml"),new cn.jja8.knapsackToGo4.bukkit.config.playerData.PlayerDataSerialize()).playerDataSerializeType;
                 PlayerDataSerializeType playerDataSerializeType = PlayerDataSerializeType.valueOf(playerDataSerialize);
                 PlayerData.playerDataSerialize = playerDataSerializeType.getYamlDataSerialize();
             } catch (IOException e) {
@@ -50,7 +50,7 @@ public class PlayerData {
                 throw new NoOptionsError(e,"加载配置文件PlayerDataSerialize.yml中"+playerDataSerialize+"值不存在！");
             }
         }else {
-            KnapsackToGo4.knapsackToGo4.getLogger().info("已加载数序列化方法扩展。["+playerDataSerialize.getClass().getName()+"]");
+            KnapsackToGo4.INSTANCE.getLogger().info("已加载数序列化方法扩展。["+playerDataSerialize.getClass().getName()+"]");
         }
     }
 
