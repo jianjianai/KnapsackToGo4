@@ -11,7 +11,7 @@ repositories {
     mavenCentral()
 }
 
-
+compileJava.options.encoding = 'UTF-8'
 //获取当前时间作为版本号
 SimpleDateFormat formatter = new SimpleDateFormat("yyyy.MM.dd.HHmm")
 //设置版本号
