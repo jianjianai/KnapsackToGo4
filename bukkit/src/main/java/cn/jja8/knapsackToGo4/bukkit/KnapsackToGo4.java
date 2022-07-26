@@ -26,7 +26,7 @@ public class KnapsackToGo4 extends JavaPlugin{
         String v = "unknown";
         try {
             v = Bukkit.getServer().getClass().getName().split("\\.")[3];
-        }catch (Error|Exception ignored){}
+        } catch (Error|Exception ignored){}
 
         try {
             PlayerData.load();
