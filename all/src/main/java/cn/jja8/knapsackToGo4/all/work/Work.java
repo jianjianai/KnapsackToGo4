@@ -466,6 +466,7 @@ public class Work {
         boolean playerQuit = false; //表示玩家已经退出
         boolean loading = false;//表示正在加载
         boolean dataError = false;//表示玩家的数据有错误
+        boolean runing = false; //表示run方法正在运行
         public PlayerStatus(Work work,Go4Player go4Player) {
             this.go4Player = go4Player;
             this.work = work;
@@ -476,18 +477,22 @@ public class Work {
             task = work.taskManager.runCircularTask(work.setUp.LockDetectionInterval, () -> {
                 time++;
                 try {
-                    if (playerLock==null){
-                        playerLock =  work.lock(go4Player);
-                        go4Player.loadingMessage(work.setUp.lang.waiting.replaceAll("<数>", String.valueOf(time)));
+                    if (runing){
+                        return;
                     }
-                    if (playerLock!=null){
-                        task.cancel();//取消循环任务
-                        go4Player.loadingMessage(work.setUp.lang.isLoading.replaceAll("<数>", String.valueOf(time)));
-                        synchronized (PlayerStatus.this){
-                            loading =true;
-                            if (playerQuit){
+                    synchronized (PlayerStatus.this) {
+                        runing = true;
+                        if (playerLock == null) {
+                            playerLock = work.lock(go4Player);
+                            go4Player.loadingMessage(work.setUp.lang.waiting.replaceAll("<数>", String.valueOf(time)));
+                        }
+                        if (playerLock != null) {
+                            task.cancel();//取消循环任务
+                            go4Player.loadingMessage(work.setUp.lang.isLoading.replaceAll("<数>", String.valueOf(time)));
+                            loading = true;
+                            if (playerQuit) {
                                 unlock();
-                            }else {
+                            } else {
                                 work.loadPlayerData(go4Player, playerLock, new UpdatePlayerDataRet() {
                                     @Override
                                     public void finish(Go4Player player, PlayerLock playerLock) {
@@ -497,28 +502,29 @@ public class Work {
 
                                     @Override
                                     public void error(Go4Player player, PlayerLock playerLock, Throwable throwable) {
-                                        if (throwable instanceof DataDeserializeException){
+                                        if (throwable instanceof DataDeserializeException) {
                                             //如果是数据序列化出错，就设置为错误。退出时不保存数据防止无法恢复。
                                             dataError = true;
                                             Loaded = true;
                                             throwable.printStackTrace();
-                                            work.logger.severe("进入时加载:玩家"+player.getName()+"的数据出错，已经取消加载。");
+                                            work.logger.severe("进入时加载:玩家" + player.getName() + "的数据出错，已经取消加载。");
                                             go4Player.loadingMessage(work.setUp.lang.isDataError.replaceAll("<数>", String.valueOf(time)));
                                             task = work.taskManager.runCircularTask(work.setUp.LockDetectionInterval, () -> {
                                                 time++;
                                                 go4Player.loadingMessage(work.setUp.lang.isDataError.replaceAll("<数>", String.valueOf(time)));
                                             });
-                                        }else {
+                                        } else {
                                             go4Player.loadingMessage(work.setUp.lang.isLoadingError.replaceAll("<数>", String.valueOf(time)));
                                             time++;
-                                            work.logger.severe("进入时加载:玩家"+player.getName()+"的数据加载失败，将在1秒后自动重试！下方是详细错误原因。");
+                                            work.logger.severe("进入时加载:玩家" + player.getName() + "的数据加载失败，将在1秒后自动重试！下方是详细错误原因。");
                                             throwable.printStackTrace();
-                                            work.taskManager.runAsynchronous(() -> work.loadPlayerData(player,playerLock,this),1000);
+                                            work.taskManager.runAsynchronous(() -> work.loadPlayerData(player, playerLock, this), 1000);
                                         }
                                     }
                                 });
                             }
                         }
+                        runing = false;
                     }
                 }catch (DataLockException e){
                     go4Player.loadingMessage(work.setUp.lang.isLoadingError.replaceAll("<数>", String.valueOf(time)));
