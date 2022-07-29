@@ -486,6 +486,9 @@ public class Work {
                             playerLock = work.lock(go4Player);
                             go4Player.loadingMessage(work.setUp.lang.waiting.replaceAll("<数>", String.valueOf(time)));
                         }
+                        if (loading){
+                            return;
+                        }
                         if (playerLock != null) {
                             task.cancel();//取消循环任务
                             go4Player.loadingMessage(work.setUp.lang.isLoading.replaceAll("<数>", String.valueOf(time)));
