@@ -38,7 +38,8 @@ public class SaveAllPlayerData implements CommandImplement , CanSetUp {
                     try {
                         KnapsackToGo4.knapsackToGo4.work.savePlayerData(player,this);
                     } catch (NoPlayerLockException e) {
-                        e.printStackTrace();
+                        KnapsackToGo4.knapsackToGo4.getLogger().info("玩家"+player.getName()+"已退出游戏，取消保存。");
+                        finish(player);
                     }
                 },20);
             }

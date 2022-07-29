@@ -9,7 +9,7 @@ import org.spongepowered.api.event.lifecycle.StoppedGameEvent;
 import org.spongepowered.plugin.PluginContainer;
 import org.spongepowered.plugin.builtin.jvm.Plugin;
 
-@Plugin("exampleplugin")
+@Plugin("KnapsackToGo4")
 public class KnapsackToGo4 {
     @Inject
     public static Logger logger;

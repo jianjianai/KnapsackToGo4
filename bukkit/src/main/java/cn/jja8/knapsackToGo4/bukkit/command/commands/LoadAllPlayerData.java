@@ -39,7 +39,8 @@ public class LoadAllPlayerData implements CommandImplement, CanSetUp {
                     try {
                         KnapsackToGo4.knapsackToGo4.work.loadPlayerData(player,this);
                     } catch (NoPlayerLockException e) {
-                        e.printStackTrace();
+                        KnapsackToGo4.knapsackToGo4.getLogger().info("玩家"+player.getName()+"已退出游戏，取消加载。");
+                        finish(player);
                     }
                 },20);
             }

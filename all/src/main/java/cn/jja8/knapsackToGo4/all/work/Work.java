@@ -91,6 +91,7 @@ public class Work {
     public static class PlayerLock{
         private final PlayerDataCaseLock playerDataCaseLock;
         private final Logger logger;
+        public boolean unlock = false;
         public PlayerLock(Logger logger,PlayerDataCaseLock playerDataCaseLock) {
             this.playerDataCaseLock = playerDataCaseLock;
             this.logger = logger;
@@ -101,10 +102,13 @@ public class Work {
          * 只要异常就代表没有解锁成功
          * */
         public void unlock() throws DataUnlockException{
-            try {
-                playerDataCaseLock.unlock();
-            } catch (Throwable e) {
-                throw new DataUnlockException(logger,e,"解锁数据错误！");
+            synchronized (this){
+                try {
+                    playerDataCaseLock.unlock();
+                    unlock = true;
+                } catch (Throwable e) {
+                    throw new DataUnlockException(logger,e,"解锁数据错误！");
+                }
             }
         }
 
@@ -112,22 +116,32 @@ public class Work {
         /**
          * 更新玩家数据,会柱塞，可在异步调用
          * */
-        private void update(byte[] data) throws DataUpdateException {
-            try {
-                playerDataCaseLock.saveData(data);
-            }catch (Throwable e){
-                throw new DataUpdateException(logger,e,"数据更新错误！");
+        private void update(byte[] data) throws DataUpdateException, NoPlayerLockException {
+            synchronized (this){
+                if (unlock){
+                    throw new NoPlayerLockException(logger,"已经被解锁，无法更新数据。");
+                }
+                try {
+                    playerDataCaseLock.saveData(data);
+                }catch (Throwable e){
+                    throw new DataUpdateException(logger,e,"数据更新错误！");
+                }
             }
         }
 
         /**
          * 查询玩家数据,会柱塞，可在异步调用
          * */
-        private byte[] select() throws DataSelectException{
-            try {
-                return playerDataCaseLock.loadData();
-            } catch (Throwable e) {
-                throw new DataSelectException(logger,e,"数据查询错误！");
+        private byte[] select() throws DataSelectException, NoPlayerLockException {
+            synchronized (this){
+                if (unlock){
+                    throw new NoPlayerLockException(logger,"已经被解锁，无法更新数据。");
+                }
+                try {
+                    return playerDataCaseLock.loadData();
+                } catch (Throwable e) {
+                    throw new DataSelectException(logger,e,"数据查询错误！");
+                }
             }
         }
     }
@@ -236,7 +250,7 @@ public class Work {
                         finalRet.error(go4Player,playerLock,e);
                     }
                 });
-            } catch (DataSelectException e) {
+            } catch (DataSelectException | NoPlayerLockException e) {
                 finalRet.error(go4Player,playerLock,e);
             }
         });
@@ -306,7 +320,7 @@ public class Work {
     public void savePlayerData(Go4Player go4Player, SavePlayerDataRet ret) throws NoPlayerLockException {
         PlayerStatus playerStatus;
         synchronized (playerStatusMap){
-            playerStatus = playerStatusMap.remove(go4Player);
+            playerStatus = playerStatusMap.get(go4Player);
         }
         if (playerStatus==null||playerStatus.playerLock==null){
             throw new NoPlayerLockException(logger,go4Player.getName()+"玩家没有锁，无法保存数据！");
@@ -369,10 +383,10 @@ public class Work {
     public void loadPlayerData(Go4Player go4Player, SavePlayerDataRet ret) throws NoPlayerLockException {
         PlayerStatus playerStatus;
         synchronized (playerStatusMap){
-            playerStatus = playerStatusMap.remove(go4Player);
+            playerStatus = playerStatusMap.get(go4Player);
         }
         if (playerStatus==null||playerStatus.playerLock==null){
-            throw new NoPlayerLockException(logger,go4Player.getName()+"玩家没有锁，无法保存数据！");
+            throw new NoPlayerLockException(logger,go4Player.getName()+"玩家没有锁，加载保存数据！");
         }
         if (ret==null){
             ret = SavePlayerDataRet.NULL;
