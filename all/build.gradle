@@ -13,6 +13,7 @@ repositories {
 
 
 dependencies {
+    implementation 'com.zaxxer:HikariCP:5.0.1'
     implementation fileTree(dir:'libs/implentation',includes:['*jar'])
     apiElements fileTree(dir:'libs/implentation',includes:['*jar'])
     compileOnly fileTree(dir:'libs/compileonly',includes:['*jar'])

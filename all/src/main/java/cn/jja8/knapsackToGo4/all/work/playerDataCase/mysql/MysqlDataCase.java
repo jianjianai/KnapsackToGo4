@@ -8,6 +8,8 @@ import cn.jja8.knapsackToGo4.all.work.playerDataCase.mysql.error.UpdateLockError
 import java.sql.*;
 import java.util.UUID;
 import cn.jja8.knapsackToGo4.all.work.Logger;
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 
 public class MysqlDataCase implements PlayerDataCase {
     static public final String NULL = "NULL";
@@ -19,6 +21,8 @@ public class MysqlDataCase implements PlayerDataCase {
     private Task TaskTimer;
     private Logger logger;
 
+    HikariDataSource hikariDataSource;//连接池
+
     public Logger getLogger() {
         return logger;
     }
@@ -26,6 +30,16 @@ public class MysqlDataCase implements PlayerDataCase {
     public MysqlDataCase(MysqlDataCaseSetUp mysqlDataCaseSetUp, TaskManager taskManager, Logger logger) throws DatabaseConnectionException, SQLException {
         this.mysqlDataCaseSetUp = mysqlDataCaseSetUp;
         this.logger = logger;
+
+
+        //建立连接
+        HikariConfig hikariConfig = new HikariConfig();
+        hikariConfig.setJdbcUrl(mysqlDataCaseSetUp.dataBaseURL);
+        hikariConfig.setUsername(mysqlDataCaseSetUp.userName);
+        hikariConfig.setPassword(mysqlDataCaseSetUp.PassWord);
+        hikariDataSource = new HikariDataSource(hikariConfig);
+
+        //创表
         Connection connection = getConnection();
         Statement statement = connection.createStatement();
         statement.execute("create table if not exists PlayerData(PlayerUUID varchar(36) not null primary key, LockUUID varchar(36), Data LONGBLOB)");
@@ -45,7 +59,7 @@ public class MysqlDataCase implements PlayerDataCase {
 
     public Connection getConnection() throws DatabaseConnectionException {
         try {
-            return DriverManager.getConnection(mysqlDataCaseSetUp.dataBaseURL, mysqlDataCaseSetUp.userName, mysqlDataCaseSetUp.PassWord);
+            return hikariDataSource.getConnection();
         } catch (SQLException e) {
             throw new DatabaseConnectionException(logger,e,"数据库连接失败，请检查dataBaseURL，userName，PassWord是否正确。");
         }
