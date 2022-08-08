@@ -20,6 +20,12 @@ public class EnderChest implements YamlDataSerializePart {
     @Override
     public void saveToYaml(Player player, ConfigurationSection configuration) {
         org.bukkit.inventory.ItemStack[] all = player.getEnderChest().getContents();
+        //为了安全，把物品复制一份。他给的数组是从新生成的，和玩家物品栏并不链接，但是里面的物品却是链接的。
+        for (int i = 0; i < all.length; i++) {
+            if (all[i]!=null) {
+                all[i] = new ItemStack(all[i]);
+            }
+        }
         configuration.set(ItemStackLen,all.length);
         ConfigurationSection itemStack = configuration.createSection(ItemStack);
         for (int i = 0; i < all.length; i++) {

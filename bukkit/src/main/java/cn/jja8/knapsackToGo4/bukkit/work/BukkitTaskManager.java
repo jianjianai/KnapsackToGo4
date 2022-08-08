@@ -5,15 +5,41 @@ import cn.jja8.knapsackToGo4.all.work.TaskManager;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+
 public class BukkitTaskManager implements TaskManager {
     private final Plugin plugin;
+    //主线程执行队列，用于缓慢主线程执行
+    BlockingQueue<Runnable> synchronizedRuns = new LinkedBlockingQueue<>();
     public BukkitTaskManager(Plugin plugin) {
         this.plugin = plugin;
+
+        //每次只执行25毫秒，避免服务器卡顿
+        Bukkit.getScheduler().runTaskTimer(plugin, () -> {
+            long stopTile = System.currentTimeMillis()+25;
+            while (stopTile>System.currentTimeMillis()){
+                Runnable runnable = synchronizedRuns.poll();
+                if (runnable!=null){
+                    try {
+                        runnable.run();
+                    }catch (Throwable throwable){
+                        throwable.printStackTrace();
+                    }
+                }else {
+                    break;
+                }
+            }
+        },1,1);
     }
+
 
     @Override
     public void runSynchronization(Runnable runnable) {
-        Bukkit.getScheduler().runTask(plugin,runnable);
+        if (!synchronizedRuns.offer(runnable)) {
+            //如果队列满了就直接执行，但是队列是不可能满的awa
+            Bukkit.getScheduler().runTask(plugin,runnable);
+        }
     }
 
     @Override
