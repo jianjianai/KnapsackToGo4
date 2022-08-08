@@ -648,6 +648,7 @@ public class Work {
             playerStatus.playerQuit();
         }
     }
+
     /**
      * 在玩家加入时调用此方法，使他开始工作
      * */

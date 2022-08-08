@@ -4,7 +4,7 @@ package cn.jja8.knapsackToGo4.all.work;
  * */
 public interface TaskManager {
     /**
-     * 在主线程上执行任务
+     * 在主线程上执行任务，可能会同时在主线程上产生大量任务，但是可以缓慢执行，并不影响工作。
      * */
      void runSynchronization(Runnable runnable);
     /**
