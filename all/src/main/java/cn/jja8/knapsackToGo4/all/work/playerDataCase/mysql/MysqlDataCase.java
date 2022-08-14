@@ -28,6 +28,12 @@ public class MysqlDataCase implements PlayerDataCase {
     }
 
     public MysqlDataCase(MysqlDataCaseSetUp mysqlDataCaseSetUp, TaskManager taskManager, Logger logger) throws DatabaseConnectionException, SQLException {
+        try {
+            Class.forName("com.mysql.jdbc.Driver");
+        } catch (ClassNotFoundException e) {
+            throw new DatabaseConnectionException(logger,e,"无法加载mysql驱动程序，可能是当前服务端中没有内置mysql，请自行下载并在启动参数中添加Class-Path");
+        }
+
         this.mysqlDataCaseSetUp = mysqlDataCaseSetUp;
         this.logger = logger;
 

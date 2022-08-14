@@ -25,6 +25,12 @@ public class SqliteDataCase implements PlayerDataCase {
     }
 
     public SqliteDataCase(SqliteDataCaseSetUp sqliteDataCaseSetUp, TaskManager taskManager, Logger logger) throws DatabaseConnectionException, SQLException {
+        try {
+            Class.forName("org.sqlite.JDBC");
+        } catch (ClassNotFoundException e) {
+            throw  new DatabaseConnectionException(logger,e,"无法加载sqlite驱动程序，可能是当前服务端中没有内置sqlite，请自行下载并在启动参数中添加Class-Path");
+        }
+
         this.sqliteDataCaseSetUp = sqliteDataCaseSetUp;
         this.logger = logger;
         Connection connection = getConnection();
