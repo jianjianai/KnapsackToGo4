@@ -53,13 +53,4 @@ public class PlayerData {
             KnapsackToGo4.knapsackToGo4.getLogger().info("已加载数序列化方法扩展。["+playerDataSerialize.getClass().getName()+"]");
         }
     }
-
-    static void close(){
-        try {
-            if (playerDataCase!=null)playerDataCase.close();
-        }catch (Error|Exception e){
-            new DataCloseError(e,"数据容器"+PlayerData.playerDataCase.getClass().getName()+"在关闭时发生异常！").printStackTrace();
-        }
-
-    }
 }

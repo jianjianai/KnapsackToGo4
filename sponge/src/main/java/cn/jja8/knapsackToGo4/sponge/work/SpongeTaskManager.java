@@ -9,32 +9,37 @@ import org.spongepowered.api.scheduler.ScheduledTaskFuture;
 import java.util.concurrent.TimeUnit;
 
 public class SpongeTaskManager implements TaskManager {
-    public final SpongeTaskManager spongeTaskManager = new SpongeTaskManager();
-    private SpongeTaskManager(){}
+    public static final SpongeTaskManager spongeTaskManager = new SpongeTaskManager();
+
+    public static SpongeTaskManager get(){
+        return spongeTaskManager;
+    }
+
+    private SpongeTaskManager() {}
 
     @Override
     public void runSynchronization(Runnable runnable) {
-        Sponge.asyncScheduler().executor(KnapsackToGo4.pluginContainer).execute(runnable);
+        Sponge.asyncScheduler().executor(KnapsackToGo4.getKnapsackToGo4().pluginContainer).execute(runnable);
     }
 
     @Override
     public void runAsynchronous(Runnable runnable) {
-        Sponge.server().scheduler().executor(KnapsackToGo4.pluginContainer).execute(runnable);
+        Sponge.server().scheduler().executor(KnapsackToGo4.getKnapsackToGo4().pluginContainer).execute(runnable);
     }
 
     @Override
     public void runSynchronization(Runnable runnable, long time) {
-        Sponge.asyncScheduler().executor(KnapsackToGo4.pluginContainer).schedule(runnable,time,TimeUnit.MILLISECONDS);
+        Sponge.asyncScheduler().executor(KnapsackToGo4.getKnapsackToGo4().pluginContainer).schedule(runnable,time,TimeUnit.MILLISECONDS);
     }
 
     @Override
     public void runAsynchronous(Runnable runnable, long time) {
-        Sponge.server().scheduler().executor(KnapsackToGo4.pluginContainer).schedule(runnable,time,TimeUnit.MILLISECONDS);
+        Sponge.server().scheduler().executor(KnapsackToGo4.getKnapsackToGo4().pluginContainer).schedule(runnable,time,TimeUnit.MILLISECONDS);
     }
 
     @Override
     public Task runCircularTask(long time, Runnable runnable) {
-        ScheduledTaskFuture<?> scheduledTaskFuture = Sponge.asyncScheduler().executor(KnapsackToGo4.pluginContainer).scheduleAtFixedRate(runnable,time,time, TimeUnit.MILLISECONDS);
+        ScheduledTaskFuture<?> scheduledTaskFuture = Sponge.asyncScheduler().executor(KnapsackToGo4.getKnapsackToGo4().pluginContainer).scheduleAtFixedRate(runnable,time,time, TimeUnit.MILLISECONDS);
         return new SpongeTask(scheduledTaskFuture);
     }
 

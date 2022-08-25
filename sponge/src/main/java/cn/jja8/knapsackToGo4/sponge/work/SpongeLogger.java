@@ -16,11 +16,11 @@ public class SpongeLogger implements Logger {
     private SpongeLogger(){}
     @Override
     public void severe(String s) {
-        KnapsackToGo4.logger.error(s);
+        KnapsackToGo4.getKnapsackToGo4().logger.error(s);
     }
 
     @Override
     public void info(String s) {
-        KnapsackToGo4.logger.info(s);
+        KnapsackToGo4.getKnapsackToGo4().logger.info(s);
     }
 }

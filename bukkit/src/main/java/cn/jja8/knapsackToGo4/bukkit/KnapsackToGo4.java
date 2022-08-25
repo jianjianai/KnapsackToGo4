@@ -1,6 +1,7 @@
 package cn.jja8.knapsackToGo4.bukkit;
 
 import cn.jja8.knapsackToGo4.all.work.SetUp;
+import cn.jja8.knapsackToGo4.all.work.Work;
 import cn.jja8.knapsackToGo4.bukkit.command.CommandManager;
 import cn.jja8.knapsackToGo4.bukkit.error.ConfigLoadError;
 import cn.jja8.knapsackToGo4.bukkit.work.BukkitGo4Player;
@@ -18,7 +19,8 @@ import java.io.IOException;
 
 public class KnapsackToGo4 extends JavaPlugin{
     public static KnapsackToGo4 knapsackToGo4;
-    public BukkitWork work;
+    public static BukkitWork work;
+    public static SetUp setUp;
 
     @Override
     public void onEnable() {
@@ -44,7 +46,6 @@ public class KnapsackToGo4 extends JavaPlugin{
             return;
         }
 
-        SetUp setUp;
         try {
             setUp = YamlConfig.loadFromFile(new File(getDataFolder(),"KnapsackToGo4SetUp.yml"),new SetUp());
         } catch (Error|IOException e) {

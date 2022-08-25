@@ -15,7 +15,7 @@ repositories {
 //获取当前时间作为版本号
 SimpleDateFormat formatter = new SimpleDateFormat("yyyy.MM.dd.HHmm")
 //设置版本号
-version = formatter.format(new Date())+"-new";//"0.03"//
+version = formatter.format(new Date());//"0.03"//
 
 dependencies {
     implementation project(":all")

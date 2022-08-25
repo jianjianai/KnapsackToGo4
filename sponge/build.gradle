@@ -7,8 +7,8 @@ plugins {
 
 compileJava.options.encoding = 'UTF-8'
 //设置版本号
-version = new SimpleDateFormat("yyyy.MM.dd.HHmm").format(new Date())+"-new";//"0.03"//
-String loaderVersion  = new SimpleDateFormat("yyyy.MM.dd").format(new Date())+"-new";//"0.03"//
+String versions = new SimpleDateFormat("yyMM.dd.HHmm").format(new Date());//"0.03"//
+version = versions
 
 group 'cn.jja8.knapsackToGo4'
 
@@ -23,12 +23,11 @@ repositories {
 sponge {
     apiVersion("8.0.0")
     loader {
-        name("knapsackToGo4")
-        version(loaderVersion)
+        name("java_plain")
+        version("1.0")
     }
-    license("CHANGEME")
     plugin("knapsacktogo4"){
-        displayName("knapsackToGo4")
+        displayName("KnapsackToGo4")
         entrypoint("cn.jja8.knapsackToGo4.sponge.KnapsackToGo4")
         description("强大的跨服数据同步插件第4代。")
         links {
@@ -40,11 +39,13 @@ sponge {
             description("简简爱")
         }
     }
+    license("CHANGEME")
 }
 
 dependencies {
     implementation project(":all")
 //    compileOnly 'org.spongepowered:spongeapi:8.0.0'
+    implementation 'com.esotericsoftware.yamlbeans:yamlbeans:1.15'
 }
 
 test {

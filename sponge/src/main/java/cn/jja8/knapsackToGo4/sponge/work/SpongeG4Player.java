@@ -9,8 +9,12 @@ import java.util.UUID;
 public class SpongeG4Player implements Go4Player {
     final Player player;
 
-    private SpongeG4Player(Player player) {
+    SpongeG4Player(Player player) {
         this.player = player;
+    }
+
+    public Player getPlayer() {
+        return player;
     }
 
     @Override
@@ -26,5 +30,22 @@ public class SpongeG4Player implements Go4Player {
     @Override
     public UUID getUUID() {
         return player.uniqueId();
+    }
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (o==null){
+            return false;
+        }
+        if (!(o instanceof SpongeG4Player)) {
+            return false;
+        }
+        return ((SpongeG4Player) o).player.uniqueId().equals(player.uniqueId());
+    }
+
+    @Override
+    public int hashCode() {
+        return player.uniqueId().hashCode();
     }
 }
