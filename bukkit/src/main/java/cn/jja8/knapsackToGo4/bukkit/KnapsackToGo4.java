@@ -17,18 +17,43 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.io.File;
 import java.io.IOException;
 
+/**
+ * 可在load阶段给work赋值，兼容更多版本
+ * */
 public class KnapsackToGo4 extends JavaPlugin{
     public static KnapsackToGo4 knapsackToGo4;
     public static BukkitWork work;
     public static SetUp setUp;
 
+    public static String v = "unknown";
+
     @Override
-    public void onEnable() {
-        knapsackToGo4 = this;
-        String v = "unknown";
+    public void onLoad() {
         try {
             v = Bukkit.getServer().getClass().getName().split("\\.")[3];
         }catch (Error|Exception ignored){}
+
+        try {
+            setUp = YamlConfig.loadFromFile(new File(getDataFolder(),"KnapsackToGo4SetUp.yml"),new SetUp());
+        } catch (Error|IOException e) {
+            getLogger().severe("插件加载时发生错误，已禁用！");
+            new ConfigLoadError(e,"KnapsackToGo4SetUp.yaml配置文件加载出错").printStackTrace();
+            getLogger().severe("插件无法启用，请参考上方报错排查问题。若需反馈请将上方报错完整提交。");
+            getLogger().severe("-------------------------------------------------------");
+            getLogger().severe("当前服务端版本："+v);
+            getLogger().severe("-------------------------------------------------------");
+            getLogger().severe("若有疑问，您可以前往 “PlugClub/插件实验室 - 820131534” 交流。");
+            getLogger().severe("为了保证数据安全，将在30秒后关闭服务器。");
+            try {Thread.sleep(30000);} catch (InterruptedException ignored) {}
+            Bukkit.shutdown();
+            setEnabled(false);
+        }
+    }
+
+    @Override
+    public void onEnable() {
+        knapsackToGo4 = this;
+
 
         try {
             PlayerData.load();
@@ -46,24 +71,15 @@ public class KnapsackToGo4 extends JavaPlugin{
             return;
         }
 
-        try {
-            setUp = YamlConfig.loadFromFile(new File(getDataFolder(),"KnapsackToGo4SetUp.yml"),new SetUp());
-        } catch (Error|IOException e) {
-            getLogger().severe("插件加载时发生错误，已禁用！");
-            new ConfigLoadError(e,"KnapsackToGo4SetUp.yaml配置文件加载出错").printStackTrace();
-            getLogger().severe("插件无法启用，请参考上方报错排查问题。若需反馈请将上方报错完整提交。");
-            getLogger().severe("-------------------------------------------------------");
-            getLogger().severe("当前服务端版本："+v);
-            getLogger().severe("-------------------------------------------------------");
-            getLogger().severe("若有疑问，您可以前往 “PlugClub/插件实验室 - 820131534” 交流。");
-            getLogger().severe("为了保证数据安全，将在30秒后关闭服务器。");
-            try {Thread.sleep(30000);} catch (InterruptedException ignored) {}
-            Bukkit.shutdown();
-            return;
+
+
+        if (work==null){
+            work = new BukkitWork(PlayerData.playerDataCase,PlayerData.playerDataSerialize,new BukkitTaskManager(this),setUp,BukkitLogger.get());
+            Bukkit.getPluginManager().registerEvents(work,this);
+        }else {
+            KnapsackToGo4.knapsackToGo4.getLogger().info("已加工作扩展。["+work.getClass().getName()+"]");
         }
 
-        work = new BukkitWork(PlayerData.playerDataCase,PlayerData.playerDataSerialize,new BukkitTaskManager(this),setUp,BukkitLogger.get());
-        Bukkit.getPluginManager().registerEvents(work,this);
 
         getLogger().info("-------------------------------------------------------");
         getLogger().info("当前服务端版本："+v);
