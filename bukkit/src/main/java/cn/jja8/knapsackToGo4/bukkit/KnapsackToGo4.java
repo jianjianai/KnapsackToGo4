@@ -27,6 +27,10 @@ public class KnapsackToGo4 extends JavaPlugin{
 
     public static String v = "unknown";
 
+    public KnapsackToGo4() {
+        knapsackToGo4 = this;
+    }
+
     @Override
     public void onLoad() {
         try {
@@ -52,9 +56,6 @@ public class KnapsackToGo4 extends JavaPlugin{
 
     @Override
     public void onEnable() {
-        knapsackToGo4 = this;
-
-
         try {
             PlayerData.load();
         } catch (Error|Exception e) {
