@@ -5,6 +5,8 @@
 
 使用KnapsackToGo4可以轻松的完成多服务器之间的数据同步。
 
+互动教程：https://jjaw.cn/2024/2/23/KnapsackToGo4/
+
 # 支持
 
 ## 自带的数据存储和同步方式
